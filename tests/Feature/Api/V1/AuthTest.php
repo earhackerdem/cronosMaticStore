@@ -30,9 +30,10 @@ class AuthTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonStructure([
-                'message',
-                'user' => ['id', 'name', 'email', 'created_at', 'updated_at'],
-                'token',
+                'data' => [
+                    'user' => ['id', 'name', 'email', 'created_at', 'updated_at'],
+                    'token',
+                ]
             ]);
     }
 
@@ -65,9 +66,10 @@ class AuthTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                'message',
-                'user' => ['id', 'name', 'email', 'created_at', 'updated_at'],
-                'token',
+                'data' => [
+                    'user' => ['id', 'name', 'email', 'created_at', 'updated_at'],
+                    'token',
+                ]
             ]);
     }
 
@@ -95,10 +97,15 @@ class AuthTest extends TestCase
         $response = $this->getJson('/api/v1/user');
 
         $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => ['id', 'name', 'email']
+            ])
             ->assertJson([
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ]
             ]);
     }
 
@@ -109,9 +116,7 @@ class AuthTest extends TestCase
 
         $response = $this->postJson('/api/v1/logout');
 
-        $response->assertStatus(200)
-            ->assertJson([
-                'message' => 'Sesión cerrada exitosamente',
-            ]);
+        $response->assertStatus(204);
+        // No hay contenido JSON que assertar para 204
     }
 }
