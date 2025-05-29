@@ -52,6 +52,15 @@
             "glob": "app/**/*.php",
             "regex": "->find\\(([^)]+)\\)(?!->|;)",
             "documentation": "https://laravel.com/docs/11.x/eloquent#retrieving-single-models"
+        },
+        {
+            "id": "no-hardcoded-user-paths",
+            "message": "Seguridad: Evitar rutas absolutas de usuario codificadas. Usar rutas relativas o variables de entorno.",
+            "severity": "warning",
+            "language": "markdown",
+            "glob": "**/*.md",
+            "regex": "(/Users/|/home/)[a-zA-Z0-9_-]+",
+            "documentation": "Evitar la filtración de información personal o de estructura del sistema."
         }
     ]
 }
