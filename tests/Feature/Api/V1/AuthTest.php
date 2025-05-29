@@ -21,7 +21,7 @@ class AuthTest extends TestCase
 
     public function test_registro_exitoso()
     {
-        $response = $this->postJson('/api/v1/register', [
+        $response = $this->postJson('/api/v1/auth/register', [
             'name' => 'Test User',
             'email' => 'testuser@example.com',
             'password' => 'password123',
@@ -41,7 +41,7 @@ class AuthTest extends TestCase
     {
         User::factory()->create(['email' => 'testuser@example.com']);
 
-        $response = $this->postJson('/api/v1/register', [
+        $response = $this->postJson('/api/v1/auth/register', [
             'name' => 'Test User',
             'email' => 'testuser@example.com',
             'password' => 'password123',
@@ -59,7 +59,7 @@ class AuthTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
 
-        $response = $this->postJson('/api/v1/login', [
+        $response = $this->postJson('/api/v1/auth/login', [
             'email' => 'testlogin@example.com',
             'password' => 'password123',
         ]);
@@ -80,7 +80,7 @@ class AuthTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
 
-        $response = $this->postJson('/api/v1/login', [
+        $response = $this->postJson('/api/v1/auth/login', [
             'email' => 'testlogin@example.com',
             'password' => 'wrongpassword',
         ]);
@@ -94,7 +94,7 @@ class AuthTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->getJson('/api/v1/user');
+        $response = $this->getJson('/api/v1/auth/user');
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -114,7 +114,7 @@ class AuthTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->postJson('/api/v1/logout');
+        $response = $this->postJson('/api/v1/auth/logout');
 
         $response->assertStatus(204);
         // No hay contenido JSON que assertar para 204
