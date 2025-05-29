@@ -1,0 +1,66 @@
+{
+    "rules": [
+        {
+            "id": "phpunit-prefer-attributes",
+            "message": "PHPUnit: Preferir atributos #[Test] sobre anotaciones @test.",
+            "severity": "info",
+            "language": "php",
+            "glob": "tests/**/*.php",
+            "regex": "@test",
+            "documentation": "https://phpunit.readthedocs.io/en/10.5/attributes.html#test"
+        },
+        {
+            "id": "php-strict-types",
+            "message": "PHP: Considerar declarar strict_types=1; para mayor seguridad de tipos.",
+            "severity": "info",
+            "language": "php",
+            "glob": "**/*.php",
+            "condition": "startsWith(fileContent, '<?php') && !includes(fileContent, 'declare(strict_types=1);')"
+        },
+        {
+            "id": "php-readonly-properties",
+            "message": "PHP: Considerar el uso de propiedades readonly para clases inmutables o DTOs (PHP 8.1+).",
+            "severity": "info",
+            "language": "php",
+            "glob": "app/**/*.php",
+            "regex": "public \\$",
+            "documentation": "https://www.php.net/manual/en/language.oop5.properties.php#language.oop5.properties.readonly-properties"
+        },
+        {
+            "id": "naming-convention-classes",
+            "message": "Convención de Nombres: Los nombres de las clases deben usar PascalCase.",
+            "severity": "warning",
+            "language": "php",
+            "glob": "**/*.php",
+            "regex": "class\\s+([a-z_][\\w_]*)\\s*",
+            "condition": "matches[1] && !/^[A-Z]/.test(matches[1])"
+        },
+        {
+            "id": "naming-convention-methods-variables",
+            "message": "Convención de Nombres: Los nombres de métodos y variables deben usar camelCase.",
+            "severity": "info",
+            "language": "php",
+            "glob": "**/*.php",
+            "regex": "(function\\s+([A-Za-z_][\\w_]*)\\s*\\(|\\$([A-Za-z_][\\w_]*)\\s*=)",
+            "condition": "(matches[2] && !/^[a-z_]/.test(matches[2]) && !/^[A-Z_]+$/.test(matches[2])) || (matches[3] && !/^[a-z_]/.test(matches[3]) && !/^[A-Z_]+$/.test(matches[3]))"
+        },
+        {
+            "id": "eloquent-find-or-fail",
+            "message": "Eloquent: Preferir findOrFail() o verificar si el resultado es null cuando se busca un solo modelo para manejar casos no encontrados.",
+            "severity": "info",
+            "language": "php",
+            "glob": "app/**/*.php",
+            "regex": "->find\\(([^)]+)\\)(?!->|;)",
+            "documentation": "https://laravel.com/docs/11.x/eloquent#retrieving-single-models"
+        },
+        {
+            "id": "no-hardcoded-user-paths",
+            "message": "Seguridad: Evitar rutas absolutas de usuario codificadas. Usar rutas relativas o variables de entorno.",
+            "severity": "warning",
+            "language": "markdown",
+            "glob": "**/*.md",
+            "regex": "(/Users/|/home/)[a-zA-Z0-9_-]+",
+            "documentation": "Evitar la filtración de información personal o de estructura del sistema."
+        }
+    ]
+}
