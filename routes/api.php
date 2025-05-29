@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\HealthCheckController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,13 +23,18 @@ Route::prefix('v1')->group(function () {
     Route::get('/status', [HealthCheckController::class, 'status']);
 
     // Rutas de autenticación
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/auth/register', [AuthController::class, 'register']);
+    Route::post('/auth/login', [AuthController::class, 'login']);
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth-status', [HealthCheckController::class, 'authStatus']);
-        Route::post('/logout', [AuthController::class, 'logout']);
-        Route::get('/user', [AuthController::class, 'user']);
+        Route::post('/auth/logout', [AuthController::class, 'logout']);
+        Route::get('/auth/user', [AuthController::class, 'user']);
+
+        // Admin protected routes
+        Route::prefix('admin')->middleware('admin')->group(function () {
+            Route::apiResource('categories', AdminCategoryController::class);
+        });
     });
 });
