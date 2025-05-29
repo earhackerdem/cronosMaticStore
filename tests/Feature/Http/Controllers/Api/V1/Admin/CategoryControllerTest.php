@@ -41,8 +41,7 @@ class CategoryControllerTest extends TestCase
         ], $overrides);
     }
 
-    /** @test */
-    public function admin_can_get_all_categories()
+    public function test_admin_can_get_all_categories()
     {
         Sanctum::actingAs($this->adminUser, ['*']);
         Category::factory()->count(3)->create();
@@ -60,8 +59,7 @@ class CategoryControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function non_admin_cannot_get_all_categories()
+    public function test_non_admin_cannot_get_all_categories()
     {
         Sanctum::actingAs($this->regularUser, ['*']);
         Category::factory()->count(3)->create();
@@ -71,8 +69,7 @@ class CategoryControllerTest extends TestCase
         $response->assertForbidden();
     }
 
-    /** @test */
-    public function admin_can_create_a_category()
+    public function test_admin_can_create_a_category()
     {
         Sanctum::actingAs($this->adminUser, ['*']);
         $categoryData = $this->createCategoryData();
@@ -87,8 +84,7 @@ class CategoryControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function non_admin_cannot_create_a_category()
+    public function test_non_admin_cannot_create_a_category()
     {
         Sanctum::actingAs($this->regularUser, ['*']);
         $categoryData = $this->createCategoryData();
@@ -98,8 +94,7 @@ class CategoryControllerTest extends TestCase
         $response->assertForbidden();
     }
 
-    /** @test */
-    public function admin_can_get_a_specific_category()
+    public function test_admin_can_get_a_specific_category()
     {
         Sanctum::actingAs($this->adminUser, ['*']);
         $category = Category::factory()->create();
@@ -110,8 +105,7 @@ class CategoryControllerTest extends TestCase
         $response->assertJsonFragment(['name' => $category->name]);
     }
 
-    /** @test */
-    public function admin_can_update_a_category()
+    public function test_admin_can_update_a_category()
     {
         Sanctum::actingAs($this->adminUser, ['*']);
         $category = Category::factory()->create();
@@ -124,8 +118,7 @@ class CategoryControllerTest extends TestCase
         $this->assertDatabaseHas('categories', ['id' => $category->id, 'name' => 'Updated Name']);
     }
 
-    /** @test */
-    public function non_admin_cannot_update_a_category()
+    public function test_non_admin_cannot_update_a_category()
     {
         Sanctum::actingAs($this->regularUser, ['*']);
         $category = Category::factory()->create();
@@ -135,8 +128,7 @@ class CategoryControllerTest extends TestCase
         $response->assertForbidden();
     }
 
-    /** @test */
-    public function admin_can_delete_a_category()
+    public function test_admin_can_delete_a_category()
     {
         Sanctum::actingAs($this->adminUser, ['*']);
         $category = Category::factory()->create();
@@ -148,8 +140,7 @@ class CategoryControllerTest extends TestCase
         // Si usas SoftDeletes, deberías usar assertSoftDeleted en su lugar.
     }
 
-    /** @test */
-    public function non_admin_cannot_delete_a_category()
+    public function test_non_admin_cannot_delete_a_category()
     {
         Sanctum::actingAs($this->regularUser, ['*']);
         $category = Category::factory()->create();
@@ -158,8 +149,7 @@ class CategoryControllerTest extends TestCase
         $response->assertForbidden();
     }
 
-    /** @test */
-    public function create_category_validation_requires_name()
+    public function test_create_category_validation_requires_name()
     {
         Sanctum::actingAs($this->adminUser, ['*']);
         $categoryData = $this->createCategoryData(['name' => '']); // Nombre vacío
@@ -170,8 +160,7 @@ class CategoryControllerTest extends TestCase
         $response->assertJsonValidationErrors('name');
     }
 
-     /** @test */
-    public function update_category_validation_works_correctly()
+    public function test_update_category_validation_works_correctly()
     {
         Sanctum::actingAs($this->adminUser, ['*']);
         $category = Category::factory()->create();

@@ -12,8 +12,7 @@ class CategoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function a_category_can_be_created_using_factory()
+    public function test_a_category_can_be_created_using_factory()
     {
         $category = Category::factory()->create([
             'name' => 'Test Category',
@@ -27,16 +26,14 @@ class CategoryTest extends TestCase
         $this->assertInstanceOf(Category::class, $category);
     }
 
-    /** @test */
-    public function category_model_uses_fillable_attributes()
+    public function test_category_model_uses_fillable_attributes()
     {
         $category = new Category();
         $fillable = ['name', 'slug', 'description', 'image_path', 'is_active'];
         $this->assertEquals($fillable, $category->getFillable());
     }
 
-    /** @test */
-    public function category_model_casts_is_active_to_boolean()
+    public function test_category_model_casts_is_active_to_boolean()
     {
         $category = Category::factory()->create(['is_active' => 1]);
         $this->assertTrue($category->is_active);
