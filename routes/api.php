@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\HealthCheckController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\V1\Admin\ImageUploadController;
+use App\Http\Controllers\Api\V1\Admin\ProductController as AdminProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +37,8 @@ Route::prefix('v1')->group(function () {
         // Admin protected routes
         Route::prefix('admin')->middleware('admin')->group(function () {
             Route::apiResource('categories', AdminCategoryController::class);
+            Route::post('images/upload', [ImageUploadController::class, 'store'])->name('admin.images.upload');
+            Route::apiResource('products', AdminProductController::class);
         });
     });
 });
