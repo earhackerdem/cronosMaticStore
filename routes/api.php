@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\V1\Admin\ImageUploadController;
 use App\Http\Controllers\Api\V1\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +25,14 @@ use App\Http\Controllers\Api\V1\Admin\ProductController as AdminProductControlle
 Route::prefix('v1')->group(function () {
     // Public routes
     Route::get('/status', [HealthCheckController::class, 'status']);
+
+    // Public Category Routes
+    Route::get('/categories', [CategoryController::class, 'index'])->name('api.v1.categories.index');
+    Route::get('/categories/{slug}', [CategoryController::class, 'show'])->name('api.v1.categories.show');
+
+    // Public Product Routes
+    Route::get('/products', [ProductController::class, 'index'])->name('api.v1.products.index');
+    Route::get('/products/{slug}', [ProductController::class, 'show'])->name('api.v1.products.show');
 
     // Rutas de autenticación
     Route::post('/auth/register', [AuthController::class, 'register']);
