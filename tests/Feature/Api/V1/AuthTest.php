@@ -19,7 +19,7 @@ class AuthTest extends TestCase
 
     }
 
-    public function test_registro_exitoso()
+    public function test_successful_registration()
     {
         $response = $this->postJson('/api/v1/auth/register', [
             'name' => 'Test User',
@@ -37,7 +37,7 @@ class AuthTest extends TestCase
             ]);
     }
 
-    public function test_registro_email_duplicado()
+    public function test_registration_fails_with_duplicate_email()
     {
         User::factory()->create(['email' => 'testuser@example.com']);
 
@@ -52,7 +52,7 @@ class AuthTest extends TestCase
             ->assertJsonValidationErrors('email');
     }
 
-    public function test_login_exitoso()
+    public function test_successful_login()
     {
         $user = User::factory()->create([
             'email' => 'testlogin@example.com',
@@ -73,7 +73,7 @@ class AuthTest extends TestCase
             ]);
     }
 
-    public function test_login_credenciales_incorrectas()
+    public function test_login_fails_with_incorrect_credentials()
     {
         $user = User::factory()->create([
             'email' => 'testlogin@example.com',
@@ -89,7 +89,7 @@ class AuthTest extends TestCase
             ->assertJsonValidationErrors('email');
     }
 
-    public function test_obtener_usuario_autenticado()
+    public function test_can_get_authenticated_user()
     {
         $user = User::factory()->create();
         Sanctum::actingAs($user);
@@ -109,7 +109,7 @@ class AuthTest extends TestCase
             ]);
     }
 
-    public function test_logout_exitoso()
+    public function test_successful_logout()
     {
         $user = User::factory()->create();
         Sanctum::actingAs($user);
