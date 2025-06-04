@@ -3,45 +3,44 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\V1\ProductResource;
+use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Http\Requests\Api\V1\ListProductsRequest;
+use App\Http\Requests\Api\V1\ShowProductRequest;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(ListProductsRequest $request)
     {
+        $validated = $request->validated();
+
         $products = Product::query()
             ->with('category')
             ->where('is_active', true)
-            ->when($request->query('category'), function ($query, $categorySlug) {
-                $query->whereHas('category', function ($q) use ($categorySlug) {
-                    $q->where('slug', $categorySlug)->where('is_active', true);
+            ->when(isset($validated['category']), function ($query) use ($validated) {
+                $query->whereHas('category', function ($q) use ($validated) {
+                    $q->where('slug', $validated['category'])->where('is_active', true);
                 });
             })
-            ->when($request->query('search'), function ($query, $searchTerm) {
+            ->when(isset($validated['search']), function ($query) use ($validated) {
+                $searchTerm = $validated['search'];
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('name', 'like', "%{$searchTerm}%")
                       ->orWhere('description', 'like', "%{$searchTerm}%")
                       ->orWhere('sku', 'like', "%{$searchTerm}%");
                 });
             })
-            ->when($request->query('sortBy') && $request->query('sortDirection'), function ($query) use ($request) {
-                $sortBy = $request->query('sortBy');
-                $sortDirection = $request->query('sortDirection', 'asc'); // asc por defecto
-                // Validar que sortBy sea una columna permitida para evitar inyección SQL si se usa directamente
-                $allowedSorts = ['name', 'price', 'created_at']; // Añadir más campos si es necesario
-                if (in_array($sortBy, $allowedSorts)) {
-                    $query->orderBy($sortBy, $sortDirection);
-                }
+            ->when(isset($validated['sortBy']), function ($query) use ($validated) {
+                $sortBy = $validated['sortBy'];
+                $sortDirection = $validated['sortDirection'] ?? 'asc';
+                $query->orderBy($sortBy, $sortDirection);
             }, function ($query) {
-                // Orden por defecto si no se especifica sortBy
                 $query->orderBy('created_at', 'desc');
             })
-            ->paginate($request->query('per_page', 15)); // 15 por página por defecto
+            ->paginate($validated['per_page'] ?? 15);
 
         return ProductResource::collection($products);
     }
@@ -49,7 +48,7 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $slug)
+    public function show(ShowProductRequest $request, string $slug)
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
