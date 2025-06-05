@@ -5,6 +5,7 @@ namespace App\Http\Resources\Api\V1\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\Api\V1\CategoryResource;
 
 class ProductResource extends JsonResource
 {

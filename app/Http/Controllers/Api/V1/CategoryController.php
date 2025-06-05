@@ -3,24 +3,28 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\V1\CategoryResource;
+use App\Http\Resources\Api\V1\CategoryResource;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Http\Requests\Api\V1\ListCategoriesRequest;
+use App\Http\Requests\Api\V1\ShowCategoryRequest;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(ListCategoriesRequest $request)
     {
-        return CategoryResource::collection(Category::where('is_active', true)->paginate());
+        $validated = $request->validated();
+        $perPage = $validated['per_page'] ?? 15;
+
+        return CategoryResource::collection(Category::where('is_active', true)->paginate($perPage));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $slug)
+    public function show(ShowCategoryRequest $request, string $slug)
     {
         $category = Category::where('slug', $slug)->where('is_active', true)->firstOrFail();
         // Cargar productos activos asociados a la categoría, paginados.

@@ -40,7 +40,8 @@ class PublicProductApiTest extends TestCase
 
         $response = $this->getJson("/api/v1/products/{$product->slug}");
 
-        $response->assertStatus(404);
+        $response->assertStatus(422)
+                 ->assertJsonValidationErrorFor('slug');
     }
 
     public function test_can_filter_products_by_active_category_slug(): void
@@ -63,15 +64,20 @@ class PublicProductApiTest extends TestCase
         }
     }
 
-    public function test_filter_products_by_inactive_category_slug_returns_no_products(): void
+    public function test_filter_products_by_inactive_category_slug_returns_validation_error(): void
     {
-        $inactiveCategory = Category::factory()->create(['is_active' => false, 'slug' => 'inactive-category']);
+        $activeCategory = Category::factory()->create(['is_active' => true]);
+        $inactiveCategory = Category::factory()->create(['is_active' => false]);
+
+        // Productos en categoría activa (no deberían aparecer si filtramos por la inactiva)
+        Product::factory()->count(2)->create(['category_id' => $activeCategory->id, 'is_active' => true]);
+        // Productos en categoría inactiva (la categoría en sí es el problema del filtro)
         Product::factory()->count(3)->create(['category_id' => $inactiveCategory->id, 'is_active' => true]);
 
         $response = $this->getJson("/api/v1/products?category={$inactiveCategory->slug}");
 
-        $response->assertStatus(200)
-            ->assertJsonCount(0, 'data');
+        $response->assertStatus(422)
+                 ->assertJsonValidationErrorFor('category');
     }
 
     public function test_can_search_active_products_by_name_description_or_sku(): void

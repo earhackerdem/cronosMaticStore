@@ -47,7 +47,8 @@ class PublicCategoryApiTest extends TestCase
 
         $response = $this->getJson("/api/v1/categories/{$category->slug}");
 
-        $response->assertStatus(404);
+        $response->assertStatus(422)
+                 ->assertJsonValidationErrorFor('slug');
     }
 
     public function test_get_single_active_public_category_does_not_show_inactive_products(): void
