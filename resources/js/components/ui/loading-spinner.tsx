@@ -14,6 +14,8 @@ export function LoadingSpinner({ className, size = 'md' }: LoadingSpinnerProps) 
 
     return (
         <div
+            data-testid="loading-spinner"
+            aria-hidden="true"
             className={cn(
                 'animate-spin rounded-full border-2 border-gray-300 border-t-blue-600',
                 sizeClasses[size],

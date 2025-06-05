@@ -289,20 +289,22 @@ export default function ProductsIndex({ products, categories, filters }: Product
 
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm text-gray-600">Vista:</span>
-                                    <Button
-                                        variant={viewMode === 'grid' ? 'default' : 'outline'}
-                                        size="sm"
-                                        onClick={() => setViewMode('grid')}
-                                    >
-                                        <Grid className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                        variant={viewMode === 'list' ? 'default' : 'outline'}
-                                        size="sm"
-                                        onClick={() => setViewMode('list')}
-                                    >
-                                        <List className="w-4 h-4" />
-                                    </Button>
+                                                        <Button
+                        variant={viewMode === 'grid' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setViewMode('grid')}
+                        aria-label="Vista de grilla"
+                    >
+                        <Grid className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant={viewMode === 'list' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setViewMode('list')}
+                        aria-label="Vista de lista"
+                    >
+                        <List className="w-4 h-4" />
+                    </Button>
                                 </div>
                             </div>
                         </CardContent>
@@ -321,13 +323,13 @@ export default function ProductsIndex({ products, categories, filters }: Product
                     {products.data.length > 0 ? (
                         <>
                             {viewMode === 'grid' ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8" data-testid="products-grid">
                                     {products.data.map((product) => (
                                         <ProductCard key={product.id} product={product} />
                                     ))}
                                 </div>
                             ) : (
-                                <div className="space-y-4 mb-8">
+                                <div className="space-y-4 mb-8" data-testid="products-list">
                                     {products.data.map((product) => (
                                         <ProductListItem key={product.id} product={product} />
                                     ))}
