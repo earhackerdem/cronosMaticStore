@@ -78,13 +78,16 @@ jobs:
 
       - name: Comment Coverage on PR
         if: github.event_name == 'pull_request'
-        uses: madrapps/jacoco-report@v1.6.1
+        uses: 5monkeys/cobertura-action@master
         with:
-          paths: ./coverage/coverage-final.json
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 70
-          min-coverage-changed-files: 70
-          title: 'Frontend Test Coverage'
+          path: ./coverage/cobertura-coverage.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          minimum_coverage: 70
+          fail_below_threshold: false
+          show_missing: true
+          show_branch: true
+          show_class_names: true
+          only_changed_files: false
 
   # component-tests:
   #   runs-on: ubuntu-latest
