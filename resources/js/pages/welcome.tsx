@@ -6,7 +6,7 @@ export default function Welcome() {
 
     return (
         <>
-            <Head title="Welcome">
+            <Head title="CronosMatic - Relojes de Alta Calidad">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
@@ -41,11 +41,11 @@ export default function Welcome() {
                 <div className="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
                     <main className="flex w-full max-w-[335px] flex-col-reverse lg:max-w-4xl lg:flex-row">
                         <div className="flex-1 rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
-                            <h1 className="mb-1 font-medium">Let's get started</h1>
+                            <h1 className="mb-1 font-medium">Bienvenido a CronosMatic</h1>
                             <p className="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
-                                Laravel has an incredibly rich ecosystem.
+                                Tu tienda especializada en relojes de alta calidad.
                                 <br />
-                                We suggest starting with the following.
+                                Descubre nuestra colección exclusiva.
                             </p>
                             <ul className="mb-4 flex flex-col lg:mb-6">
                                 <li className="relative flex items-center gap-4 py-2 before:absolute before:top-1/2 before:bottom-0 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
@@ -55,13 +55,12 @@ export default function Welcome() {
                                         </span>
                                     </span>
                                     <span>
-                                        Read the
-                                        <a
-                                            href="https://laravel.com/docs"
-                                            target="_blank"
+                                        Explora nuestro
+                                        <Link
+                                            href="/productos"
                                             className="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
                                         >
-                                            <span>Documentation</span>
+                                            <span>Catálogo de Relojes</span>
                                             <svg
                                                 width={10}
                                                 height={11}
@@ -76,7 +75,7 @@ export default function Welcome() {
                                                     strokeLinecap="square"
                                                 />
                                             </svg>
-                                        </a>
+                                        </Link>
                                     </span>
                                 </li>
                                 <li className="relative flex items-center gap-4 py-2 before:absolute before:top-0 before:bottom-1/2 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
@@ -86,32 +85,22 @@ export default function Welcome() {
                                         </span>
                                     </span>
                                     <span>
-                                        Watch video tutorials at
-                                        <a
-                                            href="https://laracasts.com"
-                                            target="_blank"
-                                            className="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
-                                        >
-                                            <span>Laracasts</span>
-                                            <svg
-                                                width={10}
-                                                height={11}
-                                                viewBox="0 0 10 11"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-2.5 w-2.5"
-                                            >
-                                                <path
-                                                    d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                                    stroke="currentColor"
-                                                    strokeLinecap="square"
-                                                />
-                                            </svg>
-                                        </a>
+                                        Descubre relojes de
+                                        <span className="ml-1 font-medium text-[#f53003] dark:text-[#FF4433]">
+                                            Movimiento Automático, De Cuerda, Híbrido y Quartz
+                                        </span>
                                     </span>
                                 </li>
                             </ul>
                             <ul className="flex gap-3 text-sm leading-normal">
+                                <li>
+                                    <Link
+                                        href="/productos"
+                                        className="inline-block rounded-sm border border-[#f53003] bg-[#f53003] px-5 py-1.5 text-sm leading-normal text-white hover:border-[#d42a02] hover:bg-[#d42a02] dark:border-[#FF4433] dark:bg-[#FF4433] dark:text-white dark:hover:border-[#e63a2a] dark:hover:bg-[#e63a2a]"
+                                    >
+                                        Ver Catálogo
+                                    </Link>
+                                </li>
                                 <li>
                                     <a
                                         href="https://cloud.laravel.com"

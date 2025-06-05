@@ -38,7 +38,18 @@ export default [
         },
     },
     {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
+        ignores: [
+            'vendor',
+            'node_modules',
+            'public',
+            'bootstrap/ssr',
+            'tailwind.config.js',
+            // Generated files
+            'resources/js/ziggy.js',
+            'resources/js/ziggy.d.ts',
+            // Test coverage
+            'coverage',
+        ],
     },
     prettier, // Turn off all rules that might conflict with Prettier
 ];

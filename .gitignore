@@ -22,3 +22,28 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Testing
+/coverage
+/cypress/screenshots
+/cypress/videos
+/cypress/downloads
+/test-results
+/.nyc_output
+/reports
+junit.xml
+coverage.xml
+
+# Database
+/database/database.sqlite
+/database/testing.sqlite
+*.sqlite
+*.sqlite-*
+
+# Logs
+*.log
+/logs
+
+# Generated files
+/resources/js/ziggy.js
+/resources/js/ziggy.d.ts

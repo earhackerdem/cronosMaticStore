@@ -93,25 +93,57 @@ composer run dev
 
 Esto iniciará concurrentemente el servidor Laravel, la cola de trabajos, los logs y Vite en modo desarrollo.
 
+## Testing
+
+Este proyecto incluye una suite completa de testing:
+
+### Comandos de Testing Disponibles
+```bash
+# Tests unitarios y de integración
+npm run test                    # Ejecutar tests en modo watch
+npm run test:run               # Ejecutar tests una vez
+npm run test:coverage          # Generar reporte de cobertura
+
+# Tests E2E con Cypress
+npm run cypress:open           # Abrir Cypress UI
+npm run cypress:run            # Ejecutar tests E2E headless
+npm run test:e2e              # Alias para cypress:run
+npm run test:e2e:open         # Alias para cypress:open
+
+# Laravel Tests
+./vendor/bin/phpunit           # Tests backend PHP
+```
+
+### Estructura de Testing
+- **Unit Tests**: `resources/js/__tests__/components/` - Tests de componentes individuales
+- **Integration Tests**: `resources/js/__tests__/pages/` - Tests de páginas completas
+- **E2E Tests**: `cypress/e2e/` - Tests end-to-end con Cypress
+- **Backend Tests**: `tests/` - Tests PHPUnit de Laravel
+
+### Cobertura de Testing
+- Umbral mínimo: 70% de cobertura
+- Reportes HTML generados en: `coverage/index.html`
+- Componentes principales cubiertos: LoadingSpinner, Button, ProductsIndex
+
 ## Workflows de GitHub Actions
 
-Este proyecto utiliza GitHub Actions para automatizar ciertas tareas:
+Este proyecto utiliza GitHub Actions para automatizar CI/CD:
 
-### Tests
+### Tests Completos (`tests.yml`)
+Se ejecuta en push/PR a `develop` y `main`:
+- **Backend Tests**: PHPUnit + Laravel
+- **Frontend Tests**: Vitest + React Testing Library + cobertura
+- **E2E Tests**: Cypress con servidor Laravel completo
 
-El workflow `tests.yml` se ejecuta en cada push y pull request a las ramas `develop` y `main`. Este workflow se encarga de:
-- Configurar PHP y Node.js.
-- Instalar dependencias de Composer y npm.
-- Compilar los assets.
-- Crear una base de datos SQLite para pruebas en `database/testing.sqlite`.
-- Generar la clave de la aplicación.
-- Ejecutar las pruebas con PHPUnit.
+### Tests Frontend Rápidos (`frontend-tests.yml`)
+Se ejecuta solo cuando cambian archivos frontend:
+- **Unit/Integration**: Tests rápidos con Vitest
+- **Component Tests**: Cypress component testing
+- **Coverage**: Reportes de cobertura automáticos en PRs
+- **Type Check**: Validación TypeScript
 
-### Linter
-
-El workflow `lint.yml` se ejecuta en cada push y pull request a las ramas `develop` y `main`. Este workflow se encarga de:
-- Configurar PHP.
-- Instalar dependencias de Composer y npm.
-- Ejecutar Pint para formatear el código PHP.
-- Ejecutar `npm run format` para formatear el código frontend.
-- Ejecutar `npm run lint` para verificar el estilo del código frontend.
+### Linter (`lint.yml`)
+Se ejecuta en push/PR a `develop` y `main`:
+- **PHP**: Laravel Pint para formateo automático
+- **Frontend**: ESLint + Prettier para código TypeScript/React
+- **Auto-format**: Formatea código automáticamente

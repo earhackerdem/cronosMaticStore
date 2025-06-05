@@ -1,0 +1,138 @@
+name: Frontend Tests
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'resources/js/**'
+      - 'resources/css/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vitest.config.ts'
+      - 'cypress.config.ts'
+      - 'tsconfig.json'
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'resources/js/**'
+      - 'resources/css/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vitest.config.ts'
+      - 'cypress.config.ts'
+      - 'tsconfig.json'
+
+jobs:
+  unit-integration-tests:
+    runs-on: ubuntu-latest
+    name: Unit & Integration Tests
+
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      checks: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install PHP Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Generate Ziggy Routes
+        run: php artisan ziggy:generate --types
+
+      - name: Run Type Check
+        run: npm run types
+
+      - name: Run Linting
+        run: npm run lint
+
+      - name: Run Unit & Integration Tests
+        run: npm run test:run
+
+      - name: Generate Coverage Report
+        run: npm run test:coverage
+
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/coverage-final.json
+          flags: frontend
+          name: frontend-coverage
+          fail_ci_if_error: false
+
+      - name: Comment Coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: 5monkeys/cobertura-action@master
+        with:
+          path: ./coverage/cobertura-coverage.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          minimum_coverage: 70
+          fail_below_threshold: false
+          show_missing: true
+          show_branch: true
+          show_class_names: true
+          only_changed_files: false
+
+  # component-tests:
+  #   runs-on: ubuntu-latest
+  #   name: Component Tests (Cypress)
+  #   if: github.event_name == 'pull_request'
+
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '22'
+  #         cache: 'npm'
+
+  #     - name: Install Dependencies
+  #       run: npm ci
+
+  #     - name: Run Cypress Component Tests
+  #       uses: cypress-io/github-action@v6
+  #       with:
+  #         install: false
+  #         component: true
+  #         browser: chrome
+
+  #     - name: Upload Component Test Screenshots
+  #       uses: actions/upload-artifact@v4
+  #       if: failure()
+  #       with:
+  #         name: component-test-screenshots
+  #         path: cypress/screenshots
+
+  #     - name: Upload Component Test Videos
+  #       uses: actions/upload-artifact@v4
+  #       if: always()
+  #       with:
+  #         name: component-test-videos
+  #         path: cypress/videos
+
+  # TODO: Habilitar component tests cuando estén completamente configurados
+  # Component testing requiere configuración adicional de React mounting
