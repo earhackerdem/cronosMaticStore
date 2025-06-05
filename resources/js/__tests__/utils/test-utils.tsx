@@ -2,7 +2,7 @@ import { render, RenderOptions } from '@testing-library/react'
 import { ReactElement } from 'react'
 
 // Función auxiliar para crear props de productos mock
-export const createMockProduct = (overrides: Partial<any> = {}) => ({
+export const createMockProduct = (overrides: Partial<Record<string, unknown>> = {}) => ({
   id: 1,
   name: 'Reloj de Prueba',
   slug: 'reloj-de-prueba',
@@ -26,7 +26,7 @@ export const createMockProduct = (overrides: Partial<any> = {}) => ({
 })
 
 // Función auxiliar para crear props de categorías mock
-export const createMockCategory = (overrides: Partial<any> = {}) => ({
+export const createMockCategory = (overrides: Partial<Record<string, unknown>> = {}) => ({
   id: 1,
   name: 'Categoría de Prueba',
   slug: 'categoria-de-prueba',
@@ -39,7 +39,7 @@ export const createMockCategory = (overrides: Partial<any> = {}) => ({
 })
 
 // Función auxiliar para crear respuesta paginada mock
-export const createMockPaginatedResponse = (data: any[], overrides: Partial<any> = {}) => ({
+export const createMockPaginatedResponse = (data: unknown[], overrides: Partial<Record<string, unknown>> = {}) => ({
   current_page: 1,
   data,
   first_page_url: 'http://localhost:8000/productos?page=1',
@@ -82,9 +82,7 @@ export const waitForElement = async (callback: () => HTMLElement | null) => {
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 // Custom render que puede incluir providers en el futuro
-interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
-  // Aquí se pueden agregar opciones personalizadas en el futuro
-}
+type CustomRenderOptions = Omit<RenderOptions, 'wrapper'>
 
 export const customRender = (
   ui: ReactElement,
