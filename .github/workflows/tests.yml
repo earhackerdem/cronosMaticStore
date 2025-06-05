@@ -11,8 +11,9 @@ on:
       - main
 
 jobs:
-  ci:
+  backend-tests:
     runs-on: ubuntu-latest
+    name: Backend Tests (PHP/Laravel)
 
     steps:
       - name: Checkout
@@ -49,5 +50,114 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
-      - name: Tests
+      - name: Run Laravel Tests
         run: ./vendor/bin/phpunit
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    name: Frontend Tests (Vitest/React)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Type Check
+        run: npm run types
+
+      - name: Run Unit & Integration Tests
+        run: npm run test:run
+
+      - name: Generate Coverage Report
+        run: npm run test:coverage
+
+      - name: Upload Coverage Reports
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/coverage-final.json
+          flags: frontend
+          name: frontend-coverage
+          fail_ci_if_error: false
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    name: End-to-End Tests (Cypress)
+    needs: [backend-tests, frontend-tests]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install PHP Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Assets
+        run: npm run build
+
+      - name: Copy Environment File
+        run: cp .env.example .env
+
+      - name: Create Testing Database
+        run: mkdir -p database && touch database/database.sqlite
+
+      - name: Generate Application Key
+        run: php artisan key:generate
+
+      - name: Run Migrations & Seeders
+        run: |
+          php artisan migrate --force
+          php artisan db:seed --force
+
+      - name: Start Laravel Server
+        run: php artisan serve &
+        env:
+          APP_ENV: testing
+
+      - name: Wait for Server
+        run: npx wait-on http://localhost:8000
+
+      - name: Run Cypress Tests
+        uses: cypress-io/github-action@v6
+        with:
+          install: false
+          wait-on: 'http://localhost:8000'
+          wait-on-timeout: 120
+          browser: chrome
+          spec: cypress/e2e/**/*.cy.ts
+
+      - name: Upload Cypress Screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+
+      - name: Upload Cypress Videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos
