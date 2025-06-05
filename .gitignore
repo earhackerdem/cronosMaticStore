@@ -43,3 +43,7 @@ coverage.xml
 # Logs
 *.log
 /logs
+
+# Generated files
+/resources/js/ziggy.js
+/resources/js/ziggy.d.ts
