@@ -9,8 +9,8 @@ Route::get('/', function () {
 })->name('home');
 
 // Rutas públicas de productos
-Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
-Route::get('/productos/{slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/productos', [ProductController::class, 'index'])->name('web.products.index');
+Route::get('/productos/{slug}', [ProductController::class, 'show'])->name('web.products.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
