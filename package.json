@@ -16,7 +16,10 @@
         "cypress:open": "cypress open",
         "cypress:run": "cypress run",
         "test:e2e": "cypress run",
-        "test:e2e:open": "cypress open"
+        "test:e2e:open": "cypress open",
+        "test:all": "npm run test:backend && npm run test:frontend && npm run test:e2e",
+        "test:backend": "composer test",
+        "test:frontend": "npm run test:run"
     },
     "devDependencies": {
         "@cypress/vite-dev-server": "^6.0.3",
