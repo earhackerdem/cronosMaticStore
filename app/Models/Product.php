@@ -31,8 +31,30 @@ class Product extends Model
         'stock_quantity' => 'integer',
     ];
 
+    protected $appends = [
+        'image_url',
+    ];
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Get the full URL for the product image
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image_path) {
+            return null;
+        }
+
+        // Si la ruta ya es una URL completa, devolverla tal como está
+        if (str_starts_with($this->image_path, 'http')) {
+            return $this->image_path;
+        }
+
+        // Generar URL completa para rutas locales
+        return url($this->image_path);
     }
 }
