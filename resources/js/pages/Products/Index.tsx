@@ -227,11 +227,14 @@ export default function ProductsIndex({ products, categories, filters }: Product
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">Todas las categorías</SelectItem>
-                                            {categories.map((category) => (
-                                                <SelectItem key={category.id} value={category.slug}>
-                                                    {category.name}
-                                                </SelectItem>
-                                            ))}
+                                            {categories
+                                                .filter((category) => category.slug && category.slug.trim() !== '')
+                                                .map((category) => (
+                                                    <SelectItem key={category.id} value={category.slug}>
+                                                        {category.name}
+                                                    </SelectItem>
+                                                ))
+                                            }
                                         </SelectContent>
                                     </Select>
                                 </div>
