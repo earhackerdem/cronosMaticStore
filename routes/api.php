@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\Admin\ImageUploadController;
 use App\Http\Controllers\Api\V1\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\ProductController;
+use App\Http\Controllers\Api\V1\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,15 @@ Route::prefix('v1')->group(function () {
     // Rutas de autenticación
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
+
+    // Cart routes (disponibles para usuarios autenticados e invitados)
+    Route::prefix('cart')->group(function () {
+        Route::get('/', [CartController::class, 'show'])->name('api.v1.cart.show');
+        Route::post('/items', [CartController::class, 'addItem'])->name('api.v1.cart.items.add');
+        Route::put('/items/{cart_item_id}', [CartController::class, 'updateItem'])->name('api.v1.cart.items.update');
+        Route::delete('/items/{cart_item_id}', [CartController::class, 'removeItem'])->name('api.v1.cart.items.remove');
+        Route::delete('/', [CartController::class, 'clear'])->name('api.v1.cart.clear');
+    });
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
