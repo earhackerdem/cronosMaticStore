@@ -1,320 +1,148 @@
-# 🧪 Testing Guide - CronosMatic
+# 🧪 Guía de Testing - CronosMatic
 
-Esta guía describe la estrategia de testing implementada en el proyecto CronosMatic, incluyendo unit tests, integration tests y end-to-end tests.
+Esta guía explica cómo ejecutar los diferentes tipos de tests en el proyecto CronosMatic.
 
-## 📋 Tabla de Contenidos
+## 📊 Tipos de Tests Disponibles
 
-- [Configuración](#configuración)
-- [Unit Tests](#unit-tests)
-- [Integration Tests](#integration-tests)
-- [End-to-End Tests](#end-to-end-tests)
-- [Coverage Reports](#coverage-reports)
-- [Comandos Disponibles](#comandos-disponibles)
-- [Mejores Prácticas](#mejores-prácticas)
+### 1. Tests de Backend (PHP/Laravel)
+- **Cantidad**: 93 tests
+- **Tipos**: Unit tests, Feature tests, API tests
+- **Framework**: PHPUnit
+- **Ubicación**: `tests/` directory
 
-## 🛠️ Configuración
+### 2. Tests de Frontend (React/TypeScript)
+- **Cantidad**: 34 tests
+- **Tipos**: Component tests, Page tests
+- **Framework**: Vitest + Testing Library
+- **Ubicación**: `resources/js/__tests__/` directory
 
-### Herramientas Utilizadas
+### 3. Tests E2E (End-to-End)
+- **Cantidad**: 11 tests
+- **Tipos**: Integration tests, User journey tests
+- **Framework**: Cypress
+- **Ubicación**: `cypress/e2e/` directory
 
-- **Vitest**: Framework de testing para unit e integration tests
-- **React Testing Library**: Utilidades para testing de componentes React
-- **Cypress**: Framework para end-to-end testing
-- **@vitest/coverage-v8**: Generación de reportes de coverage
+## 🚀 Comandos para Ejecutar Tests
 
-### Instalación
-
-Las dependencias de testing ya están incluidas en el proyecto:
-
-```bash
-npm install
-```
-
-## 🔬 Unit Tests
-
-Los unit tests se enfocan en probar componentes individuales de forma aislada.
-
-### Ubicación
-```
-resources/js/__tests__/components/ui/
-```
-
-### Ejemplos Implementados
-
-#### LoadingSpinner Component
-- ✅ Renderizado con props por defecto
-- ✅ Renderizado con diferentes tamaños
-- ✅ Atributos de accesibilidad correctos
-
-#### Button Component
-- ✅ Renderizado con props por defecto
-- ✅ Manejo de eventos de click
-- ✅ Diferentes variantes (default, destructive, outline, etc.)
-- ✅ Diferentes tamaños (sm, md, lg, icon)
-- ✅ Estado disabled
-- ✅ Aplicación de clases CSS personalizadas
-
-### Ejecutar Unit Tests
+### Ejecutar Tests Individuales
 
 ```bash
-# Ejecutar todos los unit tests
-npm run test
+# Backend (PHP/Laravel)
+composer test
+# o
+npm run test:backend
 
-# Ejecutar tests específicos
-npm run test:run loading-spinner
-npm run test:run button
+# Frontend (React/Vitest)
+npm run test:run
+# o
+npm run test:frontend
 
-# Modo watch (desarrollo)
-npm run test
-```
-
-## 🔗 Integration Tests
-
-Los integration tests verifican la interacción entre múltiples componentes.
-
-### Ubicación
-```
-resources/js/__tests__/pages/Products/
-```
-
-### Ejemplos Implementados
-
-#### Products Index Page
-- ✅ Renderizado correcto de la lista de productos
-- ✅ Visualización de estados de stock
-- ✅ Elementos de funcionalidad de búsqueda
-- ✅ Información de paginación
-- ✅ Enlaces a detalles de productos
-- ✅ Contenedor de grilla de productos
-
-### Ejecutar Integration Tests
-
-```bash
-# Ejecutar integration tests
-npm run test:run Index.test
-```
-
-## 🌐 End-to-End Tests
-
-Los tests E2E verifican el flujo completo de la aplicación desde la perspectiva del usuario.
-
-### Ubicación
-```
-cypress/e2e/
-```
-
-### Ejemplos Implementados
-
-#### Products E2E Tests
-- ✅ Visualización de la página del catálogo
-- ✅ Funcionalidad de búsqueda
-- ✅ Filtros de categoría
-- ✅ Alternancia entre vistas (grilla/lista)
-- ✅ Navegación a detalles de producto
-- ✅ Información de paginación
-- ✅ Diseño responsivo
-- ✅ Manejo de resultados vacíos
-
-### Ejecutar E2E Tests
-
-```bash
-# Ejecutar tests E2E en modo headless
+# E2E (Cypress)
 npm run test:e2e
-
-# Abrir interfaz de Cypress
-npm run test:e2e:open
-
-# Comandos alternativos
-npm run cypress:run
-npm run cypress:open
 ```
 
-### Prerequisitos para E2E Tests
-
-1. **Servidor Laravel ejecutándose**:
-   ```bash
-   php artisan serve
-   ```
-
-2. **Base de datos con datos de prueba**:
-   ```bash
-   php artisan migrate:fresh --seed
-   ```
-
-3. **Servidor Vite ejecutándose** (opcional, para desarrollo):
-   ```bash
-   npm run dev
-   ```
-
-## 📊 Coverage Reports
-
-### Generar Reportes
+### Ejecutar Todos los Tests
 
 ```bash
-# Generar reporte de coverage
-npm run test:coverage
+# Opción 1: Comando npm secuencial
+npm run test:all
+
+# Opción 2: Script shell con mejor formato
+./run-all-tests.sh
 ```
 
-### Visualizar Reportes
+## 📋 Comandos Adicionales
 
-Los reportes se generan en formato HTML y se pueden visualizar en:
-```
-coverage/index.html
-```
-
-### Umbrales de Coverage
-
-Configurados en `vitest.config.ts`:
-- **Branches**: 70%
-- **Functions**: 70%
-- **Lines**: 70%
-- **Statements**: 70%
-
-## 🚀 Comandos Disponibles
-
-### Testing Commands
-
+### Tests Frontend con Watch Mode
 ```bash
-# Unit & Integration Tests
-npm run test              # Modo watch
-npm run test:run          # Ejecutar una vez
-npm run test:ui           # Interfaz web de Vitest
-npm run test:coverage     # Con reporte de coverage
-
-# End-to-End Tests
-npm run test:e2e          # Ejecutar E2E tests
-npm run test:e2e:open     # Abrir interfaz de Cypress
-npm run cypress:run       # Ejecutar Cypress
-npm run cypress:open      # Abrir Cypress
-
-# Otros
-npm run lint              # Linting
-npm run format            # Formateo de código
-npm run types             # Verificación de tipos
+npm run test        # Modo watch (desarrollo)
+npm run test:ui     # Interfaz gráfica de Vitest
+npm run test:coverage  # Con reporte de cobertura
 ```
 
-## 📝 Mejores Prácticas
-
-### Unit Tests
-
-1. **Aislamiento**: Cada test debe ser independiente
-2. **Mocking**: Usar mocks para dependencias externas
-3. **Descriptivos**: Nombres de tests claros y descriptivos
-4. **AAA Pattern**: Arrange, Act, Assert
-
-```typescript
-it('should render with custom size', () => {
-  // Arrange
-  render(<LoadingSpinner size="lg" />)
-  
-  // Act
-  const spinner = screen.getByTestId('loading-spinner')
-  
-  // Assert
-  expect(spinner).toHaveClass('w-8', 'h-8')
-})
-```
-
-### Integration Tests
-
-1. **Flujos reales**: Probar interacciones entre componentes
-2. **Datos mock**: Usar datos realistas pero controlados
-3. **Estados**: Verificar diferentes estados de la aplicación
-
-### E2E Tests
-
-1. **Flujos de usuario**: Simular acciones reales del usuario
-2. **Datos de prueba**: Asegurar datos consistentes
-3. **Esperas**: Usar esperas apropiadas para elementos dinámicos
-4. **Selectores estables**: Usar data-testid o aria-labels
-
-```typescript
-cy.get('[data-testid="products-grid"]').should('be.visible')
-cy.get('[aria-label="Vista de lista"]').click()
-```
-
-### Estructura de Archivos
-
-```
-resources/js/__tests__/
-├── components/
-│   └── ui/
-│       ├── button.test.tsx
-│       └── loading-spinner.test.tsx
-├── pages/
-│   └── Products/
-│       └── Index.test.tsx
-└── utils/
-    └── test-utils.tsx
-
-cypress/
-├── e2e/
-│   └── products.cy.ts
-├── support/
-│   ├── commands.ts
-│   └── e2e.ts
-└── fixtures/
-```
-
-## 🔧 Configuración Avanzada
-
-### Vitest Configuration
-
-Ver `vitest.config.ts` para configuración detallada:
-- Entorno jsdom
-- Alias de paths
-- Setup files
-- Coverage settings
-
-### Cypress Configuration
-
-Ver `cypress.config.ts` para configuración:
-- Base URL
-- Timeouts
-- Viewport settings
-- Screenshot settings
-
-## 🐛 Troubleshooting
-
-### Problemas Comunes
-
-1. **Tests E2E fallan**: Verificar que el servidor Laravel esté ejecutándose
-2. **Coverage bajo**: Revisar archivos excluidos en configuración
-3. **Timeouts**: Ajustar timeouts en configuración de Cypress
-4. **Mocks no funcionan**: Verificar configuración de mocks en test-setup.ts
-
-### Debugging
-
+### Tests E2E Interactivos
 ```bash
-# Debug tests con UI
-npm run test:ui
-
-# Debug E2E tests
-npm run test:e2e:open
+npm run test:e2e:open  # Abre Cypress en modo interactivo
 ```
 
-## 📈 Métricas Actuales
+### Linting y Formateo
+```bash
+npm run lint        # ESLint con auto-fix
+npm run format      # Prettier formatting
+npm run format:check # Verificar formato
+npm run types       # TypeScript type checking
+```
 
-### Coverage Report (Última ejecución)
-- **Test Files**: 3 passed
-- **Tests**: 17 passed
-- **Components cubiertos**: LoadingSpinner (100%), Button (100%)
-- **Coverage general**: Mejorando progresivamente
+## ✅ Resultado Esperado
 
-### Tests E2E
-- **Scenarios cubiertos**: 10 escenarios principales
-- **Responsive testing**: Desktop, Tablet, Mobile
-- **Cross-browser**: Configurado para Chrome (extensible)
+Cuando todos los tests pasan exitosamente, deberías ver:
 
----
+```
+✅ Backend Tests (93 tests) - PASÓ
+✅ Frontend Tests (34 tests) - PASÓ  
+✅ E2E Tests (11 tests) - PASÓ
+🎉 Total: 138 tests
+```
 
-## 🎯 Próximos Pasos
+## 🛠️ Configuración de Tests
 
-1. **Expandir coverage**: Agregar tests para más componentes
-2. **Visual testing**: Considerar herramientas como Percy o Chromatic
-3. **Performance testing**: Agregar tests de rendimiento
-4. **API testing**: Tests de integración con endpoints
-5. **Accessibility testing**: Tests automatizados de a11y
+### Backend (PHPUnit)
+- Configuración: `phpunit.xml`
+- Base de datos: SQLite en memoria para tests
+- Factories: `database/factories/`
+- Seeders para tests: `database/seeders/`
 
----
+### Frontend (Vitest)
+- Configuración: `vitest.config.ts`
+- Setup: `resources/js/__tests__/setup.ts`
+- Mocks: Incluye mocks para Inertia.js y componentes UI
 
-**Nota**: Esta documentación se actualiza conforme se agregan nuevos tests y funcionalidades al proyecto. 
+### E2E (Cypress)
+- Configuración: `cypress.config.ts`
+- Base URL: `http://localhost:8000`
+- Soporte: `cypress/support/`
+
+## 🔧 Troubleshooting
+
+### Tests de Backend Fallan
+```bash
+# Limpiar caché y configuración
+php artisan config:clear
+php artisan cache:clear
+php artisan test
+```
+
+### Tests E2E Fallan
+```bash
+# Asegúrate de que el servidor esté corriendo
+php artisan serve  # Puerto 8000
+npm run dev        # Puerto 5173
+```
+
+### Tests de Frontend Fallan
+```bash
+# Reinstalar dependencias
+npm ci
+npm run test:run
+```
+
+## 📝 Notas Importantes
+
+1. **Prerequisitos**: Asegúrate de que los servidores estén corriendo para los tests E2E
+2. **Orden de Ejecución**: Backend → Frontend → E2E (para máxima confiabilidad)
+3. **CI/CD**: Todos los tests deben pasar antes de hacer merge a main
+4. **Cobertura**: Se recomienda mantener > 80% de cobertura en componentes críticos
+
+## 🎯 Tests por Funcionalidad
+
+### TASK-CM-012 (Página de Detalle de Producto)
+- **Backend**: `tests/Feature/Http/Controllers/ProductControllerTest.php`
+- **Frontend**: `resources/js/__tests__/pages/Products/Show.test.tsx`
+- **E2E**: `cypress/e2e/products.cy.ts`
+
+### Criterios de Aceptación Cubiertos
+- ✅ HU1.2: Vista de detalle de producto
+- ✅ HU1.5: Visualización de stock
+- ✅ Manejo de errores 404
+- ✅ Integración con API endpoints
+- ✅ Responsividad y UX
