@@ -101,3 +101,37 @@ export interface ProductsIndexProps {
         sortDirection?: 'asc' | 'desc';
     };
 }
+
+// Cart interfaces
+export interface CartItem {
+    id: number;
+    cart_id: number;
+    product_id: number;
+    quantity: number;
+    created_at: string;
+    updated_at: string;
+    product: Product;
+}
+
+export interface Cart {
+    id: number;
+    user_id: number | null;
+    session_id: string | null;
+    total_amount: number;
+    total_items: number;
+    expires_at: string | null;
+    created_at: string;
+    updated_at: string;
+    items: CartItem[];
+}
+
+export interface CartContextType {
+    cart: Cart | null;
+    isLoading: boolean;
+    error: string | null;
+    addToCart: (productId: number, quantity?: number) => Promise<void>;
+    updateCartItem: (itemId: number, quantity: number) => Promise<void>;
+    removeCartItem: (itemId: number) => Promise<void>;
+    clearCart: () => Promise<void>;
+    refreshCart: () => Promise<void>;
+}

@@ -7,14 +7,15 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ProductControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function puede_mostrar_detalle_de_producto_activo_con_todos_los_datos()
+    #[Test]
+    public function can_show_active_product_detail_with_all_data()
     {
         // Arrange: Crear categoría y producto con todos los datos
         $category = Category::factory()->create([
@@ -69,8 +70,8 @@ class ProductControllerTest extends TestCase
         );
     }
 
-    /** @test */
-    public function puede_mostrar_producto_con_datos_minimos()
+    #[Test]
+    public function can_show_product_with_minimal_data()
     {
         // Arrange: Crear producto con datos mínimos
         $product = Product::factory()->create([
@@ -112,8 +113,8 @@ class ProductControllerTest extends TestCase
         );
     }
 
-    /** @test */
-    public function puede_mostrar_producto_sin_stock()
+    #[Test]
+    public function can_show_product_without_stock()
     {
         // Arrange: Crear producto agotado
         $product = Product::factory()->create([
@@ -139,8 +140,8 @@ class ProductControllerTest extends TestCase
         );
     }
 
-    /** @test */
-    public function retorna_404_cuando_producto_no_existe()
+    #[Test]
+    public function returns_404_when_product_does_not_exist()
     {
         // Act: Intentar acceder a un producto que no existe
         $response = $this->get(route('web.products.show', 'producto-inexistente'));
@@ -149,8 +150,8 @@ class ProductControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
-    public function retorna_404_cuando_producto_esta_inactivo()
+    #[Test]
+    public function returns_404_when_product_is_inactive()
     {
         // Arrange: Crear producto inactivo
         $product = Product::factory()->create([
@@ -166,8 +167,8 @@ class ProductControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
-    public function incluye_relacion_categoria_cuando_existe()
+    #[Test]
+    public function includes_category_relation_when_exists()
     {
         // Arrange
         $category = Category::factory()->create([
@@ -200,8 +201,8 @@ class ProductControllerTest extends TestCase
         );
     }
 
-    /** @test */
-    public function no_incluye_categoria_cuando_no_existe()
+    #[Test]
+    public function does_not_include_category_when_not_exists()
     {
         // Arrange: Producto sin categoría
         $product = Product::factory()->create([
@@ -226,8 +227,8 @@ class ProductControllerTest extends TestCase
         );
     }
 
-    /** @test */
-    public function genera_url_de_imagen_correctamente()
+    #[Test]
+    public function generates_image_url_correctly()
     {
         // Arrange: Producto con imagen
         $product = Product::factory()->create([
@@ -253,8 +254,8 @@ class ProductControllerTest extends TestCase
         );
     }
 
-    /** @test */
-    public function maneja_producto_sin_imagen_correctamente()
+    #[Test]
+    public function handles_product_without_image_correctly()
     {
         // Arrange: Producto sin imagen
         $product = Product::factory()->create([
@@ -280,8 +281,8 @@ class ProductControllerTest extends TestCase
         );
     }
 
-    /** @test */
-    public function respuesta_incluye_todos_los_campos_requeridos()
+    #[Test]
+    public function response_includes_all_required_fields()
     {
         // Arrange
         $category = Category::factory()->create(['is_active' => true]);
@@ -321,8 +322,8 @@ class ProductControllerTest extends TestCase
         );
     }
 
-    /** @test */
-    public function slug_es_case_sensitive()
+    #[Test]
+    public function slug_is_case_sensitive()
     {
         // Arrange
         $product = Product::factory()->create([

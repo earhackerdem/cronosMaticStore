@@ -1,0 +1,41 @@
+{
+  "success": true,
+  "message": "Carrito obtenido correctamente",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "session_id": null,
+    "total_amount": 1500,
+    "total_items": 1,
+    "expires_at": null,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "items": [
+      {
+        "id": 1,
+        "cart_id": 1,
+        "product_id": 1,
+        "quantity": 1,
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z",
+        "product": {
+          "id": 1,
+          "name": "Reloj Automático Test",
+          "slug": "reloj-automatico-test",
+          "description": "Un reloj automático de prueba",
+          "sku": "TEST-001",
+          "price": 1500,
+          "stock_quantity": 10,
+          "brand": "Test Brand",
+          "movement_type": "Automático",
+          "image_path": null,
+          "image_url": null,
+          "is_active": true,
+          "category": null,
+          "created_at": "2024-01-01T00:00:00Z",
+          "updated_at": "2024-01-01T00:00:00Z"
+        }
+      }
+    ]
+  }
+}
