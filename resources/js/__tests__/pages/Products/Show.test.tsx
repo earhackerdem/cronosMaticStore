@@ -40,6 +40,23 @@ vi.mock('@/components/ui/separator', () => ({
     Separator: () => <hr className="separator" />,
 }));
 
+// Mock del contexto del carrito
+vi.mock('@/contexts/CartContext', () => ({
+    CartProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    useCart: () => ({
+        cart: null,
+        isLoading: false,
+        error: null,
+        addToCart: vi.fn(),
+        updateCartItem: vi.fn(),
+        removeCartItem: vi.fn(),
+        clearCart: vi.fn(),
+        refreshCart: vi.fn(),
+    }),
+}));
+
+
+
 describe('ProductShow', () => {
     const mockCategory: Category = {
         id: 1,
