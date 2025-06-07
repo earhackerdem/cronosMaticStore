@@ -12,6 +12,11 @@ export function NavUser() {
     const { state } = useSidebar();
     const isMobile = useIsMobile();
 
+    // Solo mostrar el componente si el usuario está autenticado
+    if (!auth || !auth.user) {
+        return null;
+    }
+
     return (
         <SidebarMenu>
             <SidebarMenuItem>
