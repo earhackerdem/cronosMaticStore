@@ -1,4 +1,4 @@
-describe('Funcionalidad del Carrito', () => {
+describe('Cart Functionality', () => {
     beforeEach(() => {
         // Interceptar las llamadas a la API del carrito
         cy.intercept('GET', '/api/v1/cart', { fixture: 'empty-cart.json' }).as('getEmptyCart');
@@ -8,8 +8,8 @@ describe('Funcionalidad del Carrito', () => {
         cy.intercept('DELETE', '/api/v1/cart/clear', { fixture: 'empty-cart.json' }).as('clearCart');
     });
 
-    describe('Indicador del carrito en el header', () => {
-        it('muestra el icono del carrito sin badge cuando está vacío', () => {
+    describe('Cart indicator in header', () => {
+        it('shows cart icon without badge when empty', () => {
             cy.visit('/productos');
             cy.wait('@getEmptyCart');
 
@@ -17,7 +17,7 @@ describe('Funcionalidad del Carrito', () => {
             cy.get('[data-testid="cart-badge"]').should('not.exist');
         });
 
-        it('muestra el badge con la cantidad correcta cuando hay items', () => {
+        it('shows badge with correct quantity when there are items', () => {
             cy.intercept('GET', '/api/v1/cart', { fixture: 'cart-with-items.json' }).as('getCartWithItems');
 
             cy.visit('/productos');
@@ -27,7 +27,7 @@ describe('Funcionalidad del Carrito', () => {
             cy.get('[data-testid="cart-badge"]').should('contain', '3');
         });
 
-        it('navega a la página del carrito al hacer clic', () => {
+        it('navigates to cart page when clicked', () => {
             cy.visit('/productos');
             cy.wait('@getEmptyCart');
 
@@ -36,18 +36,18 @@ describe('Funcionalidad del Carrito', () => {
         });
     });
 
-    describe('Botón "Añadir al carrito" en página de producto', () => {
+    describe('Add to cart button on product page', () => {
         beforeEach(() => {
             cy.visit('/productos/reloj-automatico-test');
         });
 
-        it('muestra el botón habilitado cuando el producto tiene stock', () => {
+        it('shows enabled button when product has stock', () => {
             cy.get('[data-testid="add-to-cart-button"]').should('be.visible');
             cy.get('[data-testid="add-to-cart-button"]').should('not.be.disabled');
             cy.get('[data-testid="add-to-cart-button"]').should('contain', 'Añadir al carrito');
         });
 
-        it('añade el producto al carrito exitosamente', () => {
+        it('adds product to cart successfully', () => {
             cy.get('[data-testid="add-to-cart-button"]').click();
             cy.wait('@addToCart');
 
@@ -58,7 +58,7 @@ describe('Funcionalidad del Carrito', () => {
             cy.get('[data-testid="cart-badge"]').should('contain', '1');
         });
 
-        it('muestra estado de carga durante la operación', () => {
+        it('shows loading state during operation', () => {
             // Simular una respuesta lenta
             cy.intercept('POST', '/api/v1/cart', {
                 fixture: 'cart-with-item.json',
@@ -75,7 +75,7 @@ describe('Funcionalidad del Carrito', () => {
             cy.get('[data-testid="add-to-cart-button"]').should('contain', '¡Añadido!');
         });
 
-        it('maneja errores de la API correctamente', () => {
+        it('handles API errors correctly', () => {
             cy.intercept('POST', '/api/v1/cart', {
                 statusCode: 400,
                 body: { success: false, message: 'Producto sin stock' }
@@ -89,8 +89,8 @@ describe('Funcionalidad del Carrito', () => {
         });
     });
 
-    describe('Página del carrito', () => {
-        it('muestra mensaje de carrito vacío cuando no hay items', () => {
+    describe('Cart page', () => {
+        it('shows empty cart message when no items', () => {
             cy.visit('/carrito');
             cy.wait('@getEmptyCart');
 
@@ -99,7 +99,7 @@ describe('Funcionalidad del Carrito', () => {
             cy.get('[data-testid="continue-shopping-button"]').should('be.visible');
         });
 
-        it('muestra los items del carrito correctamente', () => {
+        it('displays cart items correctly', () => {
             cy.intercept('GET', '/api/v1/cart', { fixture: 'cart-with-items.json' }).as('getCartWithItems');
 
             cy.visit('/carrito');
@@ -115,7 +115,7 @@ describe('Funcionalidad del Carrito', () => {
             cy.get('[data-testid="checkout-button"]').should('be.visible');
         });
 
-        it('permite actualizar la cantidad de un item', () => {
+        it('allows updating item quantity', () => {
             cy.intercept('GET', '/api/v1/cart', { fixture: 'cart-with-items.json' }).as('getCartWithItems');
 
             cy.visit('/carrito');
@@ -134,7 +134,7 @@ describe('Funcionalidad del Carrito', () => {
             });
         });
 
-        it('permite eliminar un item del carrito', () => {
+        it('allows removing item from cart', () => {
             cy.intercept('GET', '/api/v1/cart', { fixture: 'cart-with-items.json' }).as('getCartWithItems');
 
             cy.visit('/carrito');
@@ -151,7 +151,7 @@ describe('Funcionalidad del Carrito', () => {
             cy.get('[data-testid="cart-item"]').should('have.length', 1);
         });
 
-        it('permite vaciar el carrito completo', () => {
+        it('allows clearing entire cart', () => {
             cy.intercept('GET', '/api/v1/cart', { fixture: 'cart-with-items.json' }).as('getCartWithItems');
 
             cy.visit('/carrito');
@@ -169,7 +169,7 @@ describe('Funcionalidad del Carrito', () => {
             cy.get('[data-testid="empty-cart-message"]').should('be.visible');
         });
 
-        it('previene decrementar cantidad por debajo de 1', () => {
+        it('prevents decrementing quantity below 1', () => {
             cy.intercept('GET', '/api/v1/cart', { fixture: 'cart-with-single-item.json' }).as('getCartWithSingleItem');
 
             cy.visit('/carrito');
@@ -181,7 +181,7 @@ describe('Funcionalidad del Carrito', () => {
             });
         });
 
-        it('previene incrementar cantidad por encima del stock disponible', () => {
+        it('prevents incrementing quantity above available stock', () => {
             cy.intercept('GET', '/api/v1/cart', { fixture: 'cart-with-max-stock-item.json' }).as('getCartWithMaxStock');
 
             cy.visit('/carrito');
@@ -195,8 +195,8 @@ describe('Funcionalidad del Carrito', () => {
         });
     });
 
-    describe('Flujo completo de compra', () => {
-        it('permite añadir múltiples productos y proceder al checkout', () => {
+    describe('Complete purchase flow', () => {
+        it('allows adding multiple products and proceeding to checkout', () => {
             // Añadir primer producto
             cy.visit('/productos/reloj-automatico-test');
             cy.get('[data-testid="add-to-cart-button"]').click();

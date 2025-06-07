@@ -1,0 +1,106 @@
+# Cursor Rules - CronosMaticStore
+
+## General Code Standards
+
+### Language and Naming Conventions
+- All code comments, variable names, function names, and class names should be in English
+- Use descriptive and meaningful names for variables, functions, and classes
+- Follow language-specific naming conventions:
+  - PHP: PascalCase for classes, camelCase for methods and variables
+  - JavaScript/TypeScript: PascalCase for components/classes, camelCase for functions and variables
+  - CSS: kebab-case for class names
+
+### Testing Standards
+
+#### PHPUnit Tests (Laravel)
+- Use PHPUnit attributes instead of doc-comment annotations
+- Replace `/** @test */` with `#[Test]` attribute
+- Import `use PHPUnit\Framework\Attributes\Test;` at the top of test files
+- Test method names should be in English and descriptive
+- Use snake_case for test method names (PHPUnit convention)
+- Example: `can_show_active_product_detail_with_all_data()`
+
+#### E2E Tests (Cypress)
+- All describe() and it() blocks should be in English
+- Use descriptive test names that explain what is being tested
+- Follow the pattern: "should [action/behavior]" for it() blocks
+- Example: `it('should display cart icon without badge when empty')`
+
+#### Unit Tests (Vitest/Jest)
+- Test descriptions should be in English
+- Use descriptive test names
+- Follow the pattern: "should [expected behavior]"
+
+### Code Organization
+- Keep imports organized and remove unused imports
+- Use consistent indentation (2 spaces for JS/TS, 4 spaces for PHP)
+- Add proper type annotations in TypeScript
+- Use proper error handling and validation
+
+### Laravel Specific
+- Use Eloquent relationships properly
+- Prefer `findOrFail()` over `find()` when expecting a single result
+- Use form requests for validation
+- Follow Laravel naming conventions for routes, controllers, and models
+
+### React/Inertia.js Specific
+- Use TypeScript interfaces for props
+- Implement proper error boundaries
+- Use React hooks appropriately
+- Follow React best practices for component structure
+
+### Database
+- Use migrations for all database changes
+- Add proper indexes for performance
+- Use descriptive column names
+- Follow Laravel migration conventions
+
+### Security
+- Validate all user inputs
+- Use CSRF protection
+- Sanitize data before database operations
+- Follow Laravel security best practices
+
+### Performance
+- Optimize database queries (avoid N+1 problems)
+- Use proper caching strategies
+- Minimize bundle sizes
+- Optimize images and assets
+
+### Documentation
+- Add JSDoc comments for complex functions
+- Document API endpoints
+- Keep README files updated
+- Use meaningful commit messages in English
+
+## File Structure Standards
+- Follow Laravel directory structure
+- Keep components organized in logical folders
+- Use consistent file naming conventions
+- Separate concerns properly (controllers, services, repositories)
+
+## Git Standards
+- Write commit messages in English
+- Use conventional commit format when possible
+- Keep commits atomic and focused
+- Write descriptive commit messages
+
+## Error Handling
+- Implement proper error boundaries in React
+- Use try-catch blocks appropriately
+- Log errors properly for debugging
+- Provide meaningful error messages to users
+
+## Accessibility
+- Use semantic HTML elements
+- Add proper ARIA labels
+- Ensure keyboard navigation works
+- Test with screen readers when possible
+
+## Browser Compatibility
+- Test in major browsers (Chrome, Firefox, Safari, Edge)
+- Use progressive enhancement
+- Provide fallbacks for newer features
+- Consider mobile responsiveness
+
+Remember: Code should be self-documenting, maintainable, and follow established patterns within the project.
