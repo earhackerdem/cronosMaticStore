@@ -16,6 +16,12 @@ vi.mock('@inertiajs/react', () => ({
             {children}
         </a>
     ),
+    usePage: () => ({
+        props: {
+            auth: { user: null },
+            sidebarOpen: false,
+        },
+    }),
 }));
 
 const mockProduct: Product = {
@@ -130,7 +136,7 @@ describe('CartIndex', () => {
 
         expect(screen.getByText('Reloj Test')).toBeInTheDocument();
         expect(screen.getByText('Test Brand')).toBeInTheDocument();
-        expect(screen.getByText('2')).toBeInTheDocument(); // cantidad
+        expect(screen.getByTestId('item-quantity')).toHaveTextContent('2'); // cantidad específica del item
         expect(screen.getAllByText('$3,000.00')).toHaveLength(3); // aparece en item, subtotal y total
         expect(screen.getByText('$1,500.00 c/u')).toBeInTheDocument(); // precio unitario
     });

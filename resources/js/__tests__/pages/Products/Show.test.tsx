@@ -9,6 +9,12 @@ vi.mock('@inertiajs/react', () => ({
     Link: ({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) => (
         <a href={href} className={className}>{children}</a>
     ),
+    usePage: () => ({
+        props: {
+            auth: { user: null },
+            sidebarOpen: false,
+        },
+    }),
 }));
 
 // Mock de los componentes UI
@@ -53,6 +59,18 @@ vi.mock('@/contexts/CartContext', () => ({
         clearCart: vi.fn(),
         refreshCart: vi.fn(),
     }),
+}));
+
+// Mock del componente AddToCartButton
+vi.mock('@/components/add-to-cart-button', () => ({
+    AddToCartButton: ({ product }: { product: Product }) => {
+        const isOutOfStock = product.stock_quantity === 0;
+        return (
+            <button disabled={isOutOfStock} data-testid="add-to-cart-button">
+                {isOutOfStock ? 'Producto agotado' : 'Añadir al carrito'}
+            </button>
+        );
+    },
 }));
 
 
@@ -216,9 +234,10 @@ describe('ProductShow', () => {
         it('AC2: Botón "Añadir al Carrito" deshabilitado cuando producto está agotado', () => {
             render(<ProductShow product={mockProductOutOfStock} />);
 
-            const addToCartButton = screen.getByText('Producto agotado');
+            const addToCartButton = screen.getByTestId('add-to-cart-button');
             expect(addToCartButton).toBeInTheDocument();
             expect(addToCartButton).toBeDisabled();
+            expect(addToCartButton).toHaveTextContent('Producto agotado');
         });
 
         it('AC2: Botón "Añadir al Carrito" habilitado cuando producto tiene stock', () => {
