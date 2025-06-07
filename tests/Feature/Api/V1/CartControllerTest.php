@@ -54,7 +54,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function obtener_carrito_vacio_para_usuario_nuevo(): void
+    public function can_get_empty_cart_for_new_user(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -81,7 +81,7 @@ class CartControllerTest extends TestCase
     }
 
         #[Test]
-    public function obtener_carrito_vacio_para_invitado(): void
+    public function can_get_empty_cart_for_guest(): void
     {
         $response = $this->withHeaders([
             'X-Session-ID' => 'test-session-123',
@@ -109,7 +109,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function anadir_producto_valido_al_carrito(): void
+    public function can_add_valid_product_to_cart(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -137,7 +137,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function anadir_producto_con_stock_insuficiente(): void
+    public function cannot_add_product_with_insufficient_stock(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -152,7 +152,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function anadir_producto_inactivo(): void
+    public function cannot_add_inactive_product(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -167,7 +167,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function anadir_producto_inexistente(): void
+    public function cannot_add_nonexistent_product(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -182,7 +182,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function anadir_producto_con_cantidad_invalida(): void
+    public function cannot_add_product_with_invalid_quantity(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -197,7 +197,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function actualizar_cantidad_de_item_existente(): void
+    public function can_update_quantity_of_existing_item(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -225,7 +225,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function actualizar_item_inexistente(): void
+    public function cannot_update_nonexistent_item(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -237,7 +237,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function actualizar_item_de_otro_usuario(): void
+    public function cannot_update_other_user_item(): void
     {
         $otherUser = User::factory()->create();
         $otherCart = Cart::factory()->create(['user_id' => $otherUser->id]);
@@ -258,7 +258,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function eliminar_item_del_carrito(): void
+    public function can_remove_item_from_cart(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -279,7 +279,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function eliminar_item_de_otro_usuario(): void
+    public function cannot_remove_other_user_item(): void
     {
         $otherUser = User::factory()->create();
         $otherCart = Cart::factory()->create(['user_id' => $otherUser->id]);
@@ -298,7 +298,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function vaciar_carrito_completamente(): void
+    public function can_clear_cart_completely(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -333,7 +333,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function anadir_producto_como_invitado_con_session_id(): void
+    public function can_add_product_as_guest_with_session_id(): void
     {
         $response = $this->withHeaders([
             'X-Session-ID' => 'guest-session-456',
@@ -353,7 +353,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function incrementar_cantidad_cuando_producto_ya_existe_en_carrito(): void
+    public function can_increment_quantity_when_product_already_exists_in_cart(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -380,7 +380,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function validar_datos_requeridos_para_anadir_item(): void
+    public function validates_required_data_for_adding_item(): void
     {
         Sanctum::actingAs($this->user);
 
@@ -392,7 +392,7 @@ class CartControllerTest extends TestCase
     }
 
     #[Test]
-    public function validar_datos_requeridos_para_actualizar_item(): void
+    public function validates_required_data_for_updating_item(): void
     {
         Sanctum::actingAs($this->user);
 
