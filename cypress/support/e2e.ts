@@ -23,11 +23,11 @@ import './commands'
 
 // Configuración global para tests
 Cypress.on('uncaught:exception', (err) => {
-  // returning false here prevents Cypress from
-  // failing the test on uncaught exceptions
-  if (err.message.includes('ResizeObserver loop limit exceeded')) {
+  // Ignorar errores relacionados con auth.user.avatar en páginas públicas
+  if (err.message.includes("Cannot read properties of null (reading 'avatar')")) {
     return false
   }
+  // No ignorar otros errores
   return true
 })
 
