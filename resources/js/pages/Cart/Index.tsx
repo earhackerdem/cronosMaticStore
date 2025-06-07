@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { useState } from 'react';
+import AppLayout from '@/layouts/app-layout';
 
 export default function CartIndex() {
     const { cart, isLoading, updateCartItem, removeCartItem, clearCart } = useCart();
@@ -63,7 +64,7 @@ export default function CartIndex() {
 
     if (isLoading && !cart) {
         return (
-            <>
+            <AppLayout>
                 <Head title="Carrito de Compras - CronosMatic" />
                 <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                     <div className="text-center">
@@ -71,14 +72,14 @@ export default function CartIndex() {
                         <p className="text-gray-600">Cargando carrito...</p>
                     </div>
                 </div>
-            </>
+            </AppLayout>
         );
     }
 
     const isEmpty = !cart || cart.items.length === 0;
 
     return (
-        <>
+        <AppLayout>
             <Head title="Carrito de Compras - CronosMatic" />
 
             <div className="min-h-screen bg-gray-50">
@@ -187,6 +188,7 @@ export default function CartIndex() {
                                                                 onClick={() => handleRemoveItem(item.id)}
                                                                 disabled={isUpdating}
                                                                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                                data-testid="remove-item"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
                                                             </Button>
@@ -201,10 +203,11 @@ export default function CartIndex() {
                                                                     onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                                                                     disabled={item.quantity <= 1 || isUpdating}
                                                                     className="h-8 w-8 p-0"
+                                                                    data-testid="decrement-quantity"
                                                                 >
                                                                     <Minus className="w-3 h-3" />
                                                                 </Button>
-                                                                <span className="w-12 text-center font-medium">
+                                                                <span className="w-12 text-center font-medium" data-testid="item-quantity">
                                                                     {item.quantity}
                                                                 </span>
                                                                 <Button
@@ -213,6 +216,7 @@ export default function CartIndex() {
                                                                     onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                                                                     disabled={isUpdating || item.quantity >= item.product.stock_quantity}
                                                                     className="h-8 w-8 p-0"
+                                                                    data-testid="increment-quantity"
                                                                 >
                                                                     <Plus className="w-3 h-3" />
                                                                 </Button>
@@ -232,7 +236,7 @@ export default function CartIndex() {
                                                         {/* Stock warning */}
                                                         {item.quantity >= item.product.stock_quantity && (
                                                             <div className="mt-2">
-                                                                <Badge variant="outline" className="text-orange-600 border-orange-200">
+                                                                <Badge variant="outline" className="text-orange-600 border-orange-200" data-testid="stock-warning">
                                                                     Stock máximo alcanzado
                                                                 </Badge>
                                                             </div>
@@ -247,7 +251,7 @@ export default function CartIndex() {
 
                             {/* Resumen del pedido */}
                             <div className="lg:col-span-1">
-                                <Card className="sticky top-4">
+                                <Card className="sticky top-4" data-testid="order-summary">
                                     <CardHeader>
                                         <CardTitle>Resumen del pedido</CardTitle>
                                     </CardHeader>
@@ -266,10 +270,10 @@ export default function CartIndex() {
 
                                         <div className="flex justify-between text-lg font-semibold">
                                             <span>Total</span>
-                                            <span>{formatPrice(cart.total_amount)}</span>
+                                            <span data-testid="total-amount">{formatPrice(cart.total_amount)}</span>
                                         </div>
 
-                                        <Button className="w-full" size="lg">
+                                        <Button className="w-full" size="lg" data-testid="checkout-button">
                                             Proceder al pago
                                         </Button>
 
@@ -283,6 +287,6 @@ export default function CartIndex() {
                     )}
                 </div>
             </div>
-        </>
+        </AppLayout>
     );
 }

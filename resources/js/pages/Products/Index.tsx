@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import AppLayout from '@/layouts/app-layout';
 
 export default function ProductsIndex({ products, categories, filters }: ProductsIndexProps) {
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
@@ -184,7 +185,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
     );
 
     return (
-        <>
+        <AppLayout>
             <Head title="Productos - CronosMatic" />
 
             <div className="min-h-screen bg-gray-50">
@@ -392,6 +393,6 @@ export default function ProductsIndex({ products, categories, filters }: Product
                     )}
                 </div>
             </div>
-        </>
+        </AppLayout>
     );
 }

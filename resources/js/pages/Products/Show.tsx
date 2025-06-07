@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { AddToCartButton } from '@/components/add-to-cart-button';
+import AppLayout from '@/layouts/app-layout';
 
 interface ProductShowProps {
     product: Product;
@@ -34,7 +35,7 @@ export default function ProductShow({ product }: ProductShowProps) {
     const stockStatus = getStockStatus();
 
     return (
-        <>
+        <AppLayout>
             <Head title={`${product.name} - CronosMatic`} />
 
             <div className="min-h-screen bg-gray-50">
@@ -231,6 +232,6 @@ export default function ProductShow({ product }: ProductShowProps) {
                     </Card>
                 </div>
             </div>
-        </>
+        </AppLayout>
     );
 }
