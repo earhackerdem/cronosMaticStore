@@ -12,6 +12,11 @@ Route::get('/', function () {
 Route::get('/productos', [ProductController::class, 'index'])->name('web.products.index');
 Route::get('/productos/{slug}', [ProductController::class, 'show'])->name('web.products.show');
 
+// Ruta del carrito
+Route::get('/carrito', function () {
+    return Inertia::render('Cart/Index');
+})->name('web.cart.index');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
