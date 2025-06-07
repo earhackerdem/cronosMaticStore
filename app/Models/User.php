@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -56,5 +57,33 @@ class User extends Authenticatable
     public function cart(): HasOne
     {
         return $this->hasOne(Cart::class);
+    }
+
+    /**
+     * Relación con las direcciones del usuario.
+     */
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    /**
+     * Get the default shipping address.
+     */
+    public function defaultShippingAddress(): HasOne
+    {
+        return $this->hasOne(Address::class)
+            ->where('type', Address::TYPE_SHIPPING)
+            ->where('is_default', true);
+    }
+
+    /**
+     * Get the default billing address.
+     */
+    public function defaultBillingAddress(): HasOne
+    {
+        return $this->hasOne(Address::class)
+            ->where('type', Address::TYPE_BILLING)
+            ->where('is_default', true);
     }
 }
