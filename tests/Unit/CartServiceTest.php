@@ -87,7 +87,7 @@ class CartServiceTest extends TestCase
     public function it_adds_product_to_cart()
     {
         $cart = Cart::factory()->create();
-        $product = Product::factory()->create(['stock_quantity' => 10, 'price' => 25.99]);
+        $product = Product::factory()->create(['stock_quantity' => 10, 'price' => 25.99, 'is_active' => true]);
 
         $cartItem = $this->cartService->addProductToCart($cart, $product->id, 2);
 
@@ -120,7 +120,7 @@ class CartServiceTest extends TestCase
     public function it_throws_exception_for_insufficient_stock()
     {
         $cart = Cart::factory()->create();
-        $product = Product::factory()->create(['stock_quantity' => 5]);
+        $product = Product::factory()->create(['stock_quantity' => 5, 'is_active' => true]);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Stock insuficiente');
@@ -144,7 +144,7 @@ class CartServiceTest extends TestCase
     public function it_throws_exception_for_zero_or_negative_quantity()
     {
         $cart = Cart::factory()->create();
-        $product = Product::factory()->create(['stock_quantity' => 10]);
+        $product = Product::factory()->create(['stock_quantity' => 10, 'is_active' => true]);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('La cantidad debe ser mayor a 0');
@@ -155,7 +155,7 @@ class CartServiceTest extends TestCase
     #[Test]
     public function it_updates_cart_item_quantity()
     {
-        $product = Product::factory()->create(['stock_quantity' => 10, 'price' => 25.99]);
+        $product = Product::factory()->create(['stock_quantity' => 10, 'price' => 25.99, 'is_active' => true]);
         $cartItem = CartItem::factory()->create([
             'product_id' => $product->id,
             'quantity' => 2,
@@ -215,8 +215,8 @@ class CartServiceTest extends TestCase
 
         // Carrito de invitado con productos
         $guestCart = Cart::factory()->create(['session_id' => $sessionId]);
-        $product1 = Product::factory()->create(['stock_quantity' => 10, 'price' => 25.99]);
-        $product2 = Product::factory()->create(['stock_quantity' => 5, 'price' => 15.50]);
+        $product1 = Product::factory()->create(['stock_quantity' => 10, 'price' => 25.99, 'is_active' => true]);
+        $product2 = Product::factory()->create(['stock_quantity' => 5, 'price' => 15.50, 'is_active' => true]);
 
         CartItem::factory()->create([
             'cart_id' => $guestCart->id,
@@ -246,8 +246,8 @@ class CartServiceTest extends TestCase
     public function it_validates_cart_stock()
     {
         $cart = Cart::factory()->create();
-        $product1 = Product::factory()->create(['stock_quantity' => 5]);
-        $product2 = Product::factory()->create(['stock_quantity' => 2]);
+        $product1 = Product::factory()->create(['stock_quantity' => 5, 'is_active' => true]);
+        $product2 = Product::factory()->create(['stock_quantity' => 2, 'is_active' => true]);
 
         CartItem::factory()->create([
             'cart_id' => $cart->id,
