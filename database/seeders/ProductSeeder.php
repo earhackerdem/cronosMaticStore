@@ -21,11 +21,31 @@ class ProductSeeder extends Seeder
 
         Product::factory(50)->create(); // Crear 50 productos de ejemplo
 
-        // Ejemplo de creación de productos específicos si es necesario
-        // Product::factory()->create([
-        //     'name' => 'Producto de Ejemplo Específico',
-        //     'category_id' => Category::first()->id, // Asignar a la primera categoría, por ejemplo
-        //     // ... otros atributos
-        // ]);
+        // Crear productos específicos para testing E2E
+        Product::factory()->create([
+            'name' => 'Reloj Automático Test',
+            'slug' => 'reloj-automatico-test',
+            'description' => 'Un reloj automático de prueba',
+            'sku' => 'TEST-001',
+            'price' => 1500,
+            'stock_quantity' => 10,
+            'brand' => 'Test Brand',
+            'movement_type' => 'Automático',
+            'category_id' => Category::first()->id,
+            'is_active' => true,
+        ]);
+
+        Product::factory()->create([
+            'name' => 'Reloj Cuarzo Test',
+            'slug' => 'reloj-cuarzo-test',
+            'description' => 'Un reloj de cuarzo de prueba',
+            'sku' => 'TEST-002',
+            'price' => 1500,
+            'stock_quantity' => 5,
+            'brand' => 'Test Brand',
+            'movement_type' => 'Cuarzo',
+            'category_id' => Category::first()->id,
+            'is_active' => true,
+        ]);
     }
 }
