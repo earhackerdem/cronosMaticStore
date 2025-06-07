@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\Admin\ProductController as AdminProductControlle
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\CartController;
+use App\Http\Controllers\Api\V1\User\AddressController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +54,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth-status', [HealthCheckController::class, 'authStatus']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/user', [AuthController::class, 'user']);
+
+        // User Address Management Routes
+        Route::prefix('user')->group(function () {
+            Route::apiResource('addresses', AddressController::class);
+            Route::patch('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])
+                ->name('api.v1.user.addresses.set-default');
+        });
 
         // Admin protected routes
         Route::prefix('admin')->middleware('admin')->group(function () {
