@@ -51,7 +51,7 @@
         | `slug`           | `VARCHAR(255)`      | UNIQUE                                  | Slug para URL amigable                                                 |
         | `description`    | `TEXT`              | NULLABLE                                | Descripción detallada del reloj                                        |
         | `sku`            | `VARCHAR(100)`      | UNIQUE, NULLABLE                        | SKU (Stock Keeping Unit)                                               |
-        | `price`          | `DECIMAL(10, 2)`    |                                         | Precio del reloj en MXN                                                |
+        | `price`          | `DECIMAL(8, 2)`     |                                         | Precio del reloj en MXN                                                |
         | `stock_quantity` | `INT UNSIGNED`      | DEFAULT `0`                             | Cantidad en inventario                                                 |
         | `brand`          | `VARCHAR(100)`      | NULLABLE                                | Marca del reloj                                                        |
         | `movement_type`  | `VARCHAR(50)`       |                                         | Tipo de movimiento del reloj (ENUM: 'Automático', 'De Cuerda', 'Híbrido', 'Quartz') |
