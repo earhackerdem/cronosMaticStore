@@ -176,10 +176,17 @@ class CartService
     public function mergeGuestCartToUser(string $sessionId, int $userId): Cart
     {
         return DB::transaction(function () use ($sessionId, $userId) {
-            $guestCart = Cart::forSession($sessionId)->notExpired()->first();
             $userCart = $this->getOrCreateCartForUser($userId);
+            $guestCart = Cart::forSession($sessionId)->notExpired()->with('items')->first();
 
-            if (!$guestCart || $guestCart->items->isEmpty()) {
+            // Si no hay carrito de invitado, retornar carrito de usuario
+            if (!$guestCart) {
+                return $userCart;
+            }
+
+            // Si el carrito de invitado está vacío, eliminarlo y retornar carrito de usuario
+            if ($guestCart->items->isEmpty()) {
+                $guestCart->delete();
                 return $userCart;
             }
 

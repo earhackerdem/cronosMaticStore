@@ -190,7 +190,7 @@ class CartServiceTest extends TestCase
         $updatedCart = $this->cartService->updateCartTotals($cart);
 
         $this->assertEquals(5, $updatedCart->total_items);
-        $this->assertEquals('125', $updatedCart->total_amount);
+        $this->assertEquals('125.00', $updatedCart->total_amount);
     }
 
     #[Test]
@@ -204,7 +204,7 @@ class CartServiceTest extends TestCase
         $this->assertTrue($result);
         $this->assertEquals(0, $cart->fresh()->items->count());
         $this->assertEquals(0, $cart->fresh()->total_items);
-        $this->assertEquals('0', $cart->fresh()->total_amount);
+        $this->assertEquals('0.00', $cart->fresh()->total_amount);
     }
 
     #[Test]

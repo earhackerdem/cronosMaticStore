@@ -135,3 +135,24 @@ export interface CartContextType {
     clearCart: () => Promise<void>;
     refreshCart: () => Promise<void>;
 }
+
+// Address interfaces
+export interface Address {
+    id: number;
+    type: 'shipping' | 'billing';
+    first_name: string;
+    last_name: string;
+    full_name: string;
+    company?: string | null;
+    address_line_1: string;
+    address_line_2?: string | null;
+    city: string;
+    state: string;
+    postal_code: string;
+    country: string;
+    phone?: string | null;
+    is_default: boolean;
+    full_address: string;
+    created_at: string;
+    updated_at: string;
+}

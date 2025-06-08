@@ -1,11 +1,13 @@
+/// <reference types="cypress" />
+
 describe('Cart Functionality', () => {
     beforeEach(() => {
-        // Interceptar las llamadas a la API del carrito
+        // Interceptar las llamadas a la API del carrito con las URLs correctas
         cy.intercept('GET', '/api/v1/cart', { fixture: 'empty-cart.json' }).as('getEmptyCart');
-        cy.intercept('POST', '/api/v1/cart', { fixture: 'cart-with-item.json' }).as('addToCart');
+        cy.intercept('POST', '/api/v1/cart/items', { fixture: 'cart-with-item.json' }).as('addToCart');
         cy.intercept('PUT', '/api/v1/cart/items/*', { fixture: 'cart-updated.json' }).as('updateCartItem');
         cy.intercept('DELETE', '/api/v1/cart/items/*', { fixture: 'cart-item-removed.json' }).as('removeCartItem');
-        cy.intercept('DELETE', '/api/v1/cart/clear', { fixture: 'empty-cart.json' }).as('clearCart');
+        cy.intercept('DELETE', '/api/v1/cart', { fixture: 'empty-cart.json' }).as('clearCart');
     });
 
     describe('Cart indicator in header', () => {
@@ -60,7 +62,7 @@ describe('Cart Functionality', () => {
 
         it('shows loading state during operation', () => {
             // Simular una respuesta lenta
-            cy.intercept('POST', '/api/v1/cart', {
+            cy.intercept('POST', '/api/v1/cart/items', {
                 fixture: 'cart-with-item.json',
                 delay: 1000
             }).as('slowAddToCart');
@@ -76,7 +78,7 @@ describe('Cart Functionality', () => {
         });
 
         it('handles API errors correctly', () => {
-            cy.intercept('POST', '/api/v1/cart', {
+            cy.intercept('POST', '/api/v1/cart/items', {
                 statusCode: 400,
                 body: { success: false, message: 'Producto sin stock' }
             }).as('addToCartError');
@@ -207,7 +209,7 @@ describe('Cart Functionality', () => {
 
             // Añadir segundo producto
             cy.visit('/productos/reloj-cuarzo-test');
-            cy.intercept('POST', '/api/v1/cart', { fixture: 'cart-with-two-items.json' }).as('addSecondItem');
+            cy.intercept('POST', '/api/v1/cart/items', { fixture: 'cart-with-two-items.json' }).as('addSecondItem');
             cy.get('[data-testid="add-to-cart-button"]').click();
             cy.wait('@addSecondItem');
 

@@ -55,13 +55,6 @@ Route::prefix('v1')->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/user', [AuthController::class, 'user']);
 
-        // User Address Management Routes
-        Route::prefix('user')->group(function () {
-            Route::apiResource('addresses', AddressController::class);
-            Route::patch('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])
-                ->name('api.v1.user.addresses.set-default');
-        });
-
         // Admin protected routes
         Route::prefix('admin')->middleware('admin')->group(function () {
             Route::apiResource('categories', AdminCategoryController::class);
@@ -69,4 +62,6 @@ Route::prefix('v1')->group(function () {
             Route::apiResource('products', AdminProductController::class);
         });
     });
+
+    // Note: User address routes moved to web.php for better session handling
 });

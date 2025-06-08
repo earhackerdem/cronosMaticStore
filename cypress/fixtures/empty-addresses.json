@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "data": [],
+  "message": "Addresses retrieved successfully",
+  "meta": {
+    "total": 0,
+    "shipping_count": 0,
+    "billing_count": 0
+  }
+}

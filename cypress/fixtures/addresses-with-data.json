@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "type": "shipping",
+      "first_name": "John",
+      "last_name": "Doe",
+      "company": "Acme Corp",
+      "address_line_1": "123 Main St",
+      "address_line_2": "Apt 4B",
+      "city": "New York",
+      "state": "NY",
+      "postal_code": "10001",
+      "country": "USA",
+      "phone": "+1234567890",
+      "is_default": true,
+      "created_at": "2024-01-01T00:00:00.000000Z",
+      "updated_at": "2024-01-01T00:00:00.000000Z"
+    },
+    {
+      "id": 2,
+      "type": "billing",
+      "first_name": "Jane",
+      "last_name": "Smith",
+      "company": null,
+      "address_line_1": "456 Oak Ave",
+      "address_line_2": null,
+      "city": "Los Angeles",
+      "state": "CA",
+      "postal_code": "90210",
+      "country": "USA",
+      "phone": null,
+      "is_default": false,
+      "created_at": "2024-01-02T00:00:00.000000Z",
+      "updated_at": "2024-01-02T00:00:00.000000Z"
+    }
+  ],
+  "message": "Addresses retrieved successfully",
+  "meta": {
+    "total": 2,
+    "shipping_count": 1,
+    "billing_count": 1
+  }
+}

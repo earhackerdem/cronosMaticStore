@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Api\V1\User\AddressController as ApiAddressController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -21,6 +22,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+    // Address management routes (API-style but with web authentication)
+    Route::prefix('api/v1/user')->group(function () {
+        Route::get('/addresses', [ApiAddressController::class, 'index']);
+        Route::post('/addresses', [ApiAddressController::class, 'store']);
+        Route::get('/addresses/{address}', [ApiAddressController::class, 'show']);
+        Route::put('/addresses/{address}', [ApiAddressController::class, 'update']);
+        Route::patch('/addresses/{address}', [ApiAddressController::class, 'update']);
+        Route::delete('/addresses/{address}', [ApiAddressController::class, 'destroy']);
+        Route::patch('/addresses/{address}/set-default', [ApiAddressController::class, 'setDefault']);
+    });
 });
 
 require __DIR__.'/settings.php';
