@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Address extends Model
 {
@@ -52,6 +53,22 @@ class Address extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the orders that use this address as shipping address.
+     */
+    public function ordersAsShippingAddress(): HasMany
+    {
+        return $this->hasMany(Order::class, 'shipping_address_id');
+    }
+
+    /**
+     * Get the orders that use this address as billing address.
+     */
+    public function ordersAsBillingAddress(): HasMany
+    {
+        return $this->hasMany(Order::class, 'billing_address_id');
     }
 
     /**
