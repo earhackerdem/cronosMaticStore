@@ -1,8 +1,10 @@
 import '../css/app.css';
+import './lib/axios'; // Configure axios
 
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
+import { Toaster } from 'sonner';
 import { initializeTheme } from './hooks/use-appearance';
 import { CartProvider } from './contexts/CartContext';
 
@@ -17,6 +19,7 @@ createInertiaApp({
         root.render(
             <CartProvider>
                 <App {...props} />
+                <Toaster richColors position="top-right" />
             </CartProvider>
         );
     },

@@ -95,7 +95,7 @@ class CartTest extends TestCase
         CartItem::factory()->create(['cart_id' => $cart->id, 'quantity' => 2]);
         CartItem::factory()->create(['cart_id' => $cart->id, 'quantity' => 3]);
 
-        $cart->refresh();
+        $cart->load('items'); // Cargar la relación para el accessor
 
         $this->assertEquals(5, $cart->getTotalItemsAttribute());
     }
@@ -107,7 +107,7 @@ class CartTest extends TestCase
         CartItem::factory()->create(['cart_id' => $cart->id, 'total_price' => 100.50]);
         CartItem::factory()->create(['cart_id' => $cart->id, 'total_price' => 200.25]);
 
-        $cart->refresh();
+        $cart->load('items'); // Cargar la relación para el accessor
 
         $this->assertEquals('300.75', $cart->getTotalAmountAttribute());
     }

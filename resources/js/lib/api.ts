@@ -9,6 +9,44 @@ interface ApiResponse<T> {
 export class CartApi {
     private static baseUrl = '/api/v1/cart';
 
+        private static getSessionId(): string {
+        // Primero intentar obtener desde localStorage (persistente)
+        let sessionId = localStorage.getItem('cart_session_id');
+        if (sessionId) return sessionId;
+
+        // Intentar obtener session_id desde meta tag
+        const metaSessionId = document.querySelector('meta[name="session-id"]')?.getAttribute('content');
+        if (metaSessionId) {
+            localStorage.setItem('cart_session_id', metaSessionId);
+            return metaSessionId;
+        }
+
+        // Intentar obtener desde cookie de Laravel
+        const sessionCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('laravel_session='));
+
+        if (sessionCookie) {
+            const cookieSessionId = sessionCookie.split('=')[1];
+            localStorage.setItem('cart_session_id', cookieSessionId);
+            return cookieSessionId;
+        }
+
+        // Si no existe, generar uno nuevo y persistirlo
+        sessionId = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('cart_session_id', sessionId);
+        return sessionId;
+    }
+
+    private static getHeaders(): Record<string, string> {
+        return {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-Session-ID': this.getSessionId(),
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        };
+    }
+
     private static async handleResponse<T>(response: Response): Promise<T> {
         if (!response.ok) {
             const errorData = await response.json();
@@ -26,10 +64,7 @@ export class CartApi {
     static async getCart(): Promise<Cart> {
         const response = await fetch(this.baseUrl, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
+            headers: this.getHeaders(),
             credentials: 'same-origin',
         });
 
@@ -37,13 +72,9 @@ export class CartApi {
     }
 
     static async addToCart(productId: number, quantity: number = 1): Promise<Cart> {
-        const response = await fetch(this.baseUrl, {
+        const response = await fetch(`${this.baseUrl}/items`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-            },
+            headers: this.getHeaders(),
             credentials: 'same-origin',
             body: JSON.stringify({
                 product_id: productId,
@@ -57,11 +88,7 @@ export class CartApi {
     static async updateCartItem(itemId: number, quantity: number): Promise<Cart> {
         const response = await fetch(`${this.baseUrl}/items/${itemId}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-            },
+            headers: this.getHeaders(),
             credentials: 'same-origin',
             body: JSON.stringify({
                 quantity: quantity,
@@ -74,11 +101,7 @@ export class CartApi {
     static async removeCartItem(itemId: number): Promise<Cart> {
         const response = await fetch(`${this.baseUrl}/items/${itemId}`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-            },
+            headers: this.getHeaders(),
             credentials: 'same-origin',
         });
 
@@ -86,16 +109,26 @@ export class CartApi {
     }
 
     static async clearCart(): Promise<void> {
-        const response = await fetch(`${this.baseUrl}/clear`, {
+        const response = await fetch(this.baseUrl, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-            },
+            headers: this.getHeaders(),
             credentials: 'same-origin',
         });
 
         await this.handleResponse<void>(response);
+    }
+
+    /**
+     * Limpiar session_id almacenado (útil cuando usuario se autentica)
+     */
+    static clearStoredSessionId(): void {
+        localStorage.removeItem('cart_session_id');
+    }
+
+    /**
+     * Forzar actualización del session_id (para testing)
+     */
+    static setSessionId(sessionId: string): void {
+        localStorage.setItem('cart_session_id', sessionId);
     }
 }
