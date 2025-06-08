@@ -62,33 +62,28 @@
     * **Relaciones:**
         * Un `Product` pertenece a una `Category` (opcional).
         * Un `Product` puede estar en muchos `CartItem`s.
-        * Un `Product` puede estar en muchos `OrderItem`s.
-
-4.  **`carts`**
-    * Representa el carrito de compras de un usuario (logueado o invitado).
-    * **Campos:**
-        | Columna      | Tipo                | Restricciones        | Descripción                                       |
-        | :----------- | :------------------ | :------------------- | :------------------------------------------------ |
-        | `id`         | `BIGINT UNSIGNED`   | PK, AI               | Identificador único del carrito                   |
-        | `user_id`    | `BIGINT UNSIGNED`   | FK (users.id), NULLABLE, UNIQUE | Usuario al que pertenece el carrito (si está logueado) |
-        | `session_id` | `VARCHAR(255)`      | NULLABLE, INDEX      | ID de sesión para carritos de invitados           |
-        | `created_at` | `TIMESTAMP`         | NULLABLE             | Fecha de creación                                 |
-        | `updated_at` | `TIMESTAMP`         | NULLABLE             | Fecha de última actualización                     |
+        | `total_amount`   | `DECIMAL(10, 2)`    | DEFAULT `0.00`       | Monto total del carrito (calculado)               |
+        | `total_items`    | `INT UNSIGNED`      | DEFAULT `0`          | Número total de ítems en el carrito               |
+        | `expires_at`     | `TIMESTAMP`         | NULLABLE             | Fecha de expiración para carritos de invitados    |
+        | `created_at`     | `TIMESTAMP`         | NULLABLE             | Fecha de creación                                 |
+        | `updated_at`     | `TIMESTAMP`         | NULLABLE             | Fecha de última actualización                     |
     * **Relaciones:**
         * Un `Cart` puede pertenecer a un `User`.
-        * Un `Cart` tiene muchos `CartItem`s.
+        * Un `Cart` tiene muchos `CartItem`s (relación `items()`).
 
 5.  **`cart_items`**
     * Representa los productos individuales dentro de un carrito.
     * **Campos:**
-        | Columna      | Tipo                | Restricciones        | Descripción                                 |
-        | :----------- | :------------------ | :------------------- | :------------------------------------------ |
-        | `id`         | `BIGINT UNSIGNED`   | PK, AI               | Identificador único del ítem del carrito    |
-        | `cart_id`    | `BIGINT UNSIGNED`   | FK (carts.id)        | Carrito al que pertenece el ítem            |
-        | `product_id` | `BIGINT UNSIGNED`   | FK (products.id)     | Producto añadido al carrito                 |
-        | `quantity`   | `INT UNSIGNED`      | DEFAULT `1`          | Cantidad del producto en el carrito         |
-        | `created_at` | `TIMESTAMP`         | NULLABLE             | Fecha de creación                           |
-        | `updated_at` | `TIMESTAMP`         | NULLABLE             | Fecha de última actualización               |
+        | Columna       | Tipo                | Restricciones        | Descripción                                 |
+        | :------------ | :------------------ | :------------------- | :------------------------------------------ |
+        | `id`          | `BIGINT UNSIGNED`   | PK, AI               | Identificador único del ítem del carrito    |
+        | `cart_id`     | `BIGINT UNSIGNED`   | FK (carts.id)        | Carrito al que pertenece el ítem            |
+        | `product_id`  | `BIGINT UNSIGNED`   | FK (products.id)     | Producto añadido al carrito                 |
+        | `quantity`    | `INT UNSIGNED`      | DEFAULT `1`          | Cantidad del producto en el carrito         |
+        | `unit_price`  | `DECIMAL(8, 2)`     |                      | Precio unitario del producto al momento de añadir |
+        | `total_price` | `DECIMAL(10, 2)`    |                      | Precio total del ítem (quantity * unit_price) |
+        | `created_at`  | `TIMESTAMP`         | NULLABLE             | Fecha de creación                           |
+        | `updated_at`  | `TIMESTAMP`         | NULLABLE             | Fecha de última actualización               |
     * **Restricción Adicional:** UNIQUE (`cart_id`, `product_id`).
     * **Relaciones:**
         * Un `CartItem` pertenece a un `Cart`.
@@ -97,53 +92,64 @@
 6.  **`addresses`**
     * Almacena direcciones de envío y/o facturación (Libreta de direcciones del usuario).
     * **Campos:**
-        | Columna               | Tipo                | Restricciones                | Descripción                                      |
-        | :-------------------- | :------------------ | :--------------------------- | :----------------------------------------------- |
-        | `id`                  | `BIGINT UNSIGNED`   | PK, AI                       | Identificador único de la dirección              |
-        | `user_id`             | `BIGINT UNSIGNED`   | FK (users.id)                | Usuario al que pertenece la dirección            |
-        | `full_name`           | `VARCHAR(255)`      |                              | Nombre completo del destinatario                 |
-        | `street_address`      | `VARCHAR(255)`      |                              | Calle y número                                   |
-        | `apartment_suite_etc` | `VARCHAR(255)`      | NULLABLE                     | Número interior, departamento, etc.              |
-        | `city`                | `VARCHAR(100)`      |                              | Ciudad                                           |
-        | `state`               | `VARCHAR(100)`      |                              | Estado/Provincia                                 |
-        | `postal_code`         | `VARCHAR(20)`       |                              | Código Postal                                    |
-        | `country_code`        | `VARCHAR(2)`        | DEFAULT `'MX'`               | Código de país (ISO 3166-1 alfa-2)             |
-        | `phone_number`        | `VARCHAR(50)`       | NULLABLE                     | Número de teléfono de contacto                   |
-        | `is_default_shipping` | `BOOLEAN`           | DEFAULT `false`              | Dirección de envío por defecto del usuario       |
-        | `is_default_billing`  | `BOOLEAN`           | DEFAULT `false`              | Dirección de facturación por defecto del usuario |
-        | `created_at`          | `TIMESTAMP`         | NULLABLE                     | Fecha de creación                                |
-        | `updated_at`          | `TIMESTAMP`         | NULLABLE                     | Fecha de última actualización                    |
+        | Columna           | Tipo                | Restricciones                | Descripción                                      |
+        | :---------------- | :------------------ | :--------------------------- | :----------------------------------------------- |
+        | `id`              | `BIGINT UNSIGNED`   | PK, AI                       | Identificador único de la dirección              |
+        | `user_id`         | `BIGINT UNSIGNED`   | FK (users.id)                | Usuario al que pertenece la dirección            |
+        | `type`            | `VARCHAR(50)`       | DEFAULT `'shipping'`         | Tipo de dirección ('shipping' o 'billing')      |
+        | `first_name`      | `VARCHAR(255)`      |                              | Nombre del destinatario                          |
+        | `last_name`       | `VARCHAR(255)`      |                              | Apellido del destinatario                        |
+        | `company`         | `VARCHAR(255)`      | NULLABLE                     | Nombre de la empresa (opcional)                  |
+        | `address_line_1`  | `VARCHAR(255)`      |                              | Línea principal de dirección (calle y número)   |
+        | `address_line_2`  | `VARCHAR(255)`      | NULLABLE                     | Línea secundaria (colonia, depto, etc.)         |
+        | `city`            | `VARCHAR(255)`      |                              | Ciudad                                           |
+        | `state`           | `VARCHAR(255)`      |                              | Estado/Provincia                                 |
+        | `postal_code`     | `VARCHAR(20)`       |                              | Código Postal                                    |
+        | `country`         | `VARCHAR(255)`      |                              | País completo                                    |
+        | `phone`           | `VARCHAR(50)`       | NULLABLE                     | Número de teléfono de contacto                   |
+        | `is_default`      | `BOOLEAN`           | DEFAULT `false`              | Dirección por defecto para el tipo especificado |
+        | `created_at`      | `TIMESTAMP`         | NULLABLE                     | Fecha de creación                                |
+        | `updated_at`      | `TIMESTAMP`         | NULLABLE                     | Fecha de última actualización                    |
+    * **Índices:**
+        * INDEX (`user_id`, `type`) - Para búsquedas por usuario y tipo
+        * INDEX (`user_id`, `is_default`) - Para direcciones por defecto
     * **Relaciones:**
         * Una `Address` pertenece a un `User`.
-        * Una `Address` puede ser usada en muchos `Order`s (como dirección de envío o facturación referenciada desde la tabla `orders`).
+        * Una `Address` puede ser usada en muchos `Order`s (como dirección de envío o facturación).
+        * **Accessor:** `full_name` (computed: `first_name` + `last_name`)
+        * **Accessor:** `full_address` (computed: dirección completa formateada)
 
 7.  **`orders`**
     * Representa un pedido realizado por un cliente.
-    * **Campos:**
-        | Columna               | Tipo                | Restricciones                           | Descripción                                     |
-        | :-------------------- | :------------------ | :-------------------------------------- | :---------------------------------------------- |
-        | `id`                  | `BIGINT UNSIGNED`   | PK, AI                                  | Identificador único del pedido                  |
-        | `user_id`             | `BIGINT UNSIGNED`   | FK (users.id), NULLABLE                 | Usuario que realizó el pedido                   |
-        | `guest_email`         | `VARCHAR(255)`      | NULLABLE                                | Email del invitado                              |
-        | `order_number`        | `VARCHAR(32)`       | UNIQUE                                  | Número de pedido único                          |
-        | `shipping_address_id` | `BIGINT UNSIGNED`   | FK (addresses.id)                       | Dirección de envío del pedido                   |
-        | `billing_address_id`  | `BIGINT UNSIGNED`   | FK (addresses.id), NULLABLE             | Dirección de facturación del pedido             |
-        | `status`              | `VARCHAR(50)`       | DEFAULT `'pendiente_pago'`              | Estado actual del pedido (ENUM: 'pendiente_pago', 'procesando', 'enviado', 'entregado', 'cancelado') |
-        | `subtotal_amount`     | `DECIMAL(10, 2)`    |                                         | Suma de los precios de los ítems                |
-        | `shipping_cost`       | `DECIMAL(10, 2)`    | DEFAULT `0.00`                          | Costo del envío                                 |
-        | `total_amount`        | `DECIMAL(10, 2)`    |                                         | Monto total del pedido                          |
-        | `payment_gateway`     | `VARCHAR(50)`       | NULLABLE                                | Pasarela de pago utilizada                      |
-        | `payment_id`          | `VARCHAR(255)`      | NULLABLE, INDEX                         | ID de la transacción en la pasarela             |
-        | `payment_status`      | `VARCHAR(50)`       | DEFAULT `'pendiente'`                   | Estado del pago (ENUM: 'pendiente', 'pagado', 'fallido', 'reembolsado') |
-        | `shipping_method_name`| `VARCHAR(100)`      | NULLABLE                                | Nombre del método de envío                      |
-        | `notes`               | `TEXT`              | NULLABLE                                | Notas adicionales                               |
-        | `created_at`          | `TIMESTAMP`         | NULLABLE                                | Fecha de creación                               |
-        | `updated_at`          | `TIMESTAMP`         | NULLABLE                                | Fecha de última actualización                   |
+    | Columna               | Tipo                | Restricciones                           | Descripción                                     |
+    | :-------------------- | :------------------ | :-------------------------------------- | :---------------------------------------------- |
+    | `id`                  | `BIGINT UNSIGNED`   | PK, AI                                  | Identificador único del pedido                  |
+    | `user_id`             | `BIGINT UNSIGNED`   | FK (users.id), NULLABLE                 | Usuario que realizó el pedido                   |
+    | `guest_email`         | `VARCHAR(255)`      | NULLABLE                                | Email del invitado                              |
+    | `order_number`        | `VARCHAR(32)`       | UNIQUE                                  | Número de pedido único                          |
+    | `shipping_address_id` | `BIGINT UNSIGNED`   | FK (addresses.id)                       | Dirección de envío del pedido                   |
+    | `billing_address_id`  | `BIGINT UNSIGNED`   | FK (addresses.id), NULLABLE             | Dirección de facturación del pedido             |
+    | `status`              | `VARCHAR(50)`       | DEFAULT `'pendiente_pago'`              | Estado actual del pedido (ENUM: 'pendiente_pago', 'procesando', 'enviado', 'entregado', 'cancelado') |
+    | `subtotal_amount`     | `DECIMAL(10, 2)`    |                                         | Suma de los precios de los ítems                |
+    | `shipping_cost`       | `DECIMAL(10, 2)`    | DEFAULT `0.00`                          | Costo del envío                                 |
+    | `total_amount`        | `DECIMAL(10, 2)`    |                                         | Monto total del pedido                          |
+    | `payment_gateway`     | `VARCHAR(50)`       | NULLABLE                                | Pasarela de pago utilizada                      |
+    | `payment_id`          | `VARCHAR(255)`      | NULLABLE, INDEX                         | ID de la transacción en la pasarela             |
+    | `payment_status`      | `VARCHAR(50)`       | DEFAULT `'pendiente'`                   | Estado del pago (ENUM: 'pendiente', 'pagado', 'fallido', 'reembolsado') |
+    | `shipping_method_name`| `VARCHAR(100)`      | NULLABLE                                | Nombre del método de envío                      |
+    | `notes`               | `TEXT`              | NULLABLE                                | Notas adicionales                               |
+    | `created_at`          | `TIMESTAMP`         | NULLABLE                                | Fecha de creación                               |
+    | `updated_at`          | `TIMESTAMP`         | NULLABLE                                | Fecha de última actualización                   |
+    * **Índices:**
+        * INDEX (`user_id`, `created_at`) - Para historial de pedidos
+        * INDEX (`guest_email`, `created_at`) - Para pedidos de invitados
+        * INDEX (`status`) - Para filtros por estado
+        * INDEX (`payment_status`) - Para filtros por estado de pago
     * **Relaciones:**
         * Un `Order` pertenece a un `User` (opcional).
         * Un `Order` tiene muchos `OrderItem`s.
-        * Un `Order` tiene una `Address` de envío (relación `belongsTo`).
-        * Un `Order` tiene una `Address` de facturación (relación `belongsTo`).
+        * Un `Order` tiene una `Address` de envío (relación `shippingAddress()`).
+        * Un `Order` tiene una `Address` de facturación (relación `billingAddress()`).
 
 8.  **`order_items`**
     * Representa los productos individuales dentro de un pedido.
@@ -159,6 +165,9 @@
         | `total_price`    | `DECIMAL(10, 2)`    |                         | Precio total para este ítem (cantidad * precio)  |
         | `created_at`     | `TIMESTAMP`         | NULLABLE                | Fecha de creación                                |
         | `updated_at`     | `TIMESTAMP`         | NULLABLE                | Fecha de última actualización                    |
+    * **Índices:**
+        * INDEX (`order_id`) - Para consultas por pedido
+        * INDEX (`product_id`) - Para estadísticas de productos
     * **Relaciones:**
         * Un `OrderItem` pertenece a un `Order`.
         * Un `OrderItem` referencia a un `Product`.
@@ -225,6 +234,9 @@ erDiagram
         BIGINT id PK
         BIGINT user_id FK
         VARCHAR session_id
+        DECIMAL total_amount
+        INT total_items
+        TIMESTAMP expires_at
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -234,6 +246,8 @@ erDiagram
         BIGINT cart_id FK
         BIGINT product_id FK
         INT quantity
+        DECIMAL unit_price
+        DECIMAL total_price
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -241,16 +255,18 @@ erDiagram
     ADDRESSES {
         BIGINT id PK
         BIGINT user_id FK
-        VARCHAR full_name
-        VARCHAR street_address
-        VARCHAR apartment_suite_etc
+        VARCHAR type
+        VARCHAR first_name
+        VARCHAR last_name
+        VARCHAR company
+        VARCHAR address_line_1
+        VARCHAR address_line_2
         VARCHAR city
         VARCHAR state
         VARCHAR postal_code
-        VARCHAR country_code
-        VARCHAR phone_number
-        BOOLEAN is_default_shipping
-        BOOLEAN is_default_billing
+        VARCHAR country
+        VARCHAR phone
+        BOOLEAN is_default
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -287,3 +303,25 @@ erDiagram
         TIMESTAMP updated_at
     }
 ```
+
+## Diferencias Implementadas vs Documentación Original
+
+**Nota Importante:** Este modelo de datos refleja la implementación actual del sistema, que incluye mejoras y optimizaciones sobre la especificación original:
+
+### Tabla `addresses`:
+- **Mejora:** Separación de `full_name` en `first_name` y `last_name` para mejor experiencia de usuario en formularios
+- **Mejora:** Campo `company` para direcciones comerciales
+- **Mejora:** Sistema de `type` + `is_default` más escalable que campos separados para shipping/billing
+- **Mejora:** Campo `country` completo en lugar de código de 2 caracteres para mejor usabilidad
+- **Mejora:** Campo `phone` en lugar de `phone_number` para consistencia
+
+### Tabla `carts`:
+- **Mejora:** Campos `total_amount` y `total_items` para rendimiento optimizado
+- **Mejora:** Campo `expires_at` para gestión automática de carritos de invitados
+
+### Tabla `cart_items`:
+- **Mejora:** Campos `unit_price` y `total_price` para histórico de precios y cálculos optimizados
+
+### Relaciones:
+- **Mejora:** Método `items()` en lugar de `cartItems()` para mejor consistencia con convenciones de Laravel
+- **Mejora:** Accessors `full_name` y `full_address` en Address para compatibilidad
