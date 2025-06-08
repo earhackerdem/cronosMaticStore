@@ -30,6 +30,7 @@ class CartController extends Controller
     {
         try {
             $cart = $this->getCartForCurrentUser($request);
+            $cart->load(['items.product']);
 
             return response()->json([
                 'success' => true,
@@ -181,18 +182,19 @@ class CartController extends Controller
         }
     }
 
-    /**
+        /**
      * Obtiene el carrito para el usuario actual (autenticado o invitado).
      */
     private function getCartForCurrentUser(Request $request)
     {
-        if (Auth::check()) {
-            return $this->cartService->getOrCreateCartForUser(Auth::id());
-        }
-
-        // Para invitados, usar session_id del header o cookie
         $sessionId = $request->header('X-Session-ID') ?? $request->cookie('cart_session_id') ?? session()->getId();
 
+        if (Auth::check()) {
+            // Para usuarios autenticados, intentar fusionar carrito de invitado si existe
+            return $this->cartService->mergeGuestCartToUser($sessionId, Auth::id());
+        }
+
+        // Para invitados, usar session_id
         return $this->cartService->getOrCreateCartForGuest($sessionId);
     }
 }
