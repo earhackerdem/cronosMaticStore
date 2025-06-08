@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\User\AddressController;
+use App\Http\Controllers\Api\V1\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +48,15 @@ Route::prefix('v1')->group(function () {
         Route::put('/items/{cart_item_id}', [CartController::class, 'updateItem'])->name('api.v1.cart.items.update');
         Route::delete('/items/{cart_item_id}', [CartController::class, 'removeItem'])->name('api.v1.cart.items.remove');
         Route::delete('/', [CartController::class, 'clear'])->name('api.v1.cart.clear');
+    });
+
+    // Payment routes
+    Route::prefix('payments')->group(function () {
+        Route::post('/paypal/create-order', [PaymentController::class, 'createPayPalOrder'])->name('api.v1.payments.paypal.create');
+        Route::post('/paypal/capture-order', [PaymentController::class, 'capturePayPalOrder'])->name('api.v1.payments.paypal.capture');
+        Route::post('/paypal/simulate-success', [PaymentController::class, 'simulateSuccessfulPayment'])->name('api.v1.payments.paypal.simulate.success');
+        Route::post('/paypal/simulate-failure', [PaymentController::class, 'simulateFailedPayment'])->name('api.v1.payments.paypal.simulate.failure');
+        Route::get('/paypal/verify-config', [PaymentController::class, 'verifyPayPalConfig'])->name('api.v1.payments.paypal.verify');
     });
 
     // Protected routes

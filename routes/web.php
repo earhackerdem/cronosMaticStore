@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Api\V1\User\AddressController as ApiAddressController;
+use App\Http\Controllers\PaymentReturnController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -17,6 +18,10 @@ Route::get('/productos/{slug}', [ProductController::class, 'show'])->name('web.p
 Route::get('/carrito', function () {
     return Inertia::render('Cart/Index');
 })->name('web.cart.index');
+
+// PayPal return routes
+Route::get('/orders/payment/success', [PaymentReturnController::class, 'success'])->name('orders.payment.success');
+Route::get('/orders/payment/cancel', [PaymentReturnController::class, 'cancel'])->name('orders.payment.cancel');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
