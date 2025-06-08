@@ -132,29 +132,38 @@ A continuación, se detallan los endpoints para cada recurso principal.
     * **Respuesta Exitosa (200 OK):** `{"data": {cart_object_actualizado}}` o `204 No Content`.
     * **Errores:** 404 (Ítem no encontrado en carrito)
 
-### v. Direcciones (`/addresses`) (Para libreta de direcciones del usuario)
+### v. Direcciones (`/user/addresses`) (Para libreta de direcciones del usuario)
 
-* **`GET /addresses`**
+* **`GET /user/addresses`**
     * **Auth:** Sanctum
     * **Descripción:** Lista las direcciones guardadas por el usuario autenticado.
+    * **Parámetros Query:** `type` (string, opcional: 'shipping' o 'billing') - Filtra por tipo de dirección
     * **Respuesta Exitosa (200 OK):** `{"data": [{address_object_completo}]}`
 
-* **`POST /addresses`**
+* **`POST /user/addresses`**
     * **Auth:** Sanctum
     * **Descripción:** Añade una nueva dirección a la libreta del usuario.
     * **Cuerpo Petición (JSON):**
         ```json
         {
-          "full_name": "string", "street_address": "string", "apartment_suite_etc": "string_opcional",
-          "city": "string", "state": "string", "postal_code": "string", "country_code": "string",
-          "phone_number": "string_opcional", "is_default_shipping": "boolean_opcional",
-          "is_default_billing": "boolean_opcional"
+          "type": "shipping|billing",
+          "first_name": "string",
+          "last_name": "string", 
+          "company": "string_opcional",
+          "address_line_1": "string",
+          "address_line_2": "string_opcional",
+          "city": "string",
+          "state": "string",
+          "postal_code": "string",
+          "country": "string",
+          "phone": "string_opcional",
+          "is_default": "boolean_opcional"
         }
         ```
     * **Respuesta Exitosa (201 Created):** `{"data": {address_object_creado}}`
     * **Errores:** 422 (Validación)
 
-* **`PUT /addresses/{address_id}`**
+* **`PUT /user/addresses/{address_id}`**
     * **Auth:** Sanctum
     * **Descripción:** Actualiza una dirección existente del usuario.
     * **Parámetros URL:** `address_id` (integer)
@@ -162,26 +171,49 @@ A continuación, se detallan los endpoints para cada recurso principal.
     * **Respuesta Exitosa (200 OK):** `{"data": {address_object_actualizado}}`
     * **Errores:** 403 (No autorizado para esta dirección), 404 (Dirección no encontrada), 422 (Validación)
 
-* **`DELETE /addresses/{address_id}`**
+* **`DELETE /user/addresses/{address_id}`**
     * **Auth:** Sanctum
     * **Descripción:** Elimina una dirección de la libreta del usuario.
     * **Parámetros URL:** `address_id` (integer)
     * **Respuesta Exitosa (204 No Content):** (Sin cuerpo)
     * **Errores:** 403, 404
 
-* **`PATCH /addresses/{address_id}/set-default-shipping`**
+* **`PATCH /user/addresses/{address_id}/set-default`**
     * **Auth:** Sanctum
-    * **Descripción:** Marca una dirección como la de envío por defecto para el usuario.
+    * **Descripción:** Marca una dirección como predeterminada para su tipo (shipping o billing).
     * **Parámetros URL:** `address_id` (integer)
     * **Respuesta Exitosa (200 OK):** `{"data": {address_object_actualizado}}`
     * **Errores:** 403, 404
 
-* **`PATCH /addresses/{address_id}/set-default-billing`**
-    * **Auth:** Sanctum
-    * **Descripción:** Marca una dirección como la de facturación por defecto para el usuario.
-    * **Parámetros URL:** `address_id` (integer)
-    * **Respuesta Exitosa (200 OK):** `{"data": {address_object_actualizado}}`
-    * **Errores:** 403, 404
+**Objeto Address completo:**
+```json
+{
+  "id": 1,
+  "type": "shipping",
+  "first_name": "Juan",
+  "last_name": "Pérez",
+  "full_name": "Juan Pérez",
+  "company": "Mi Empresa S.A.",
+  "address_line_1": "Av. Reforma 123",
+  "address_line_2": "Col. Centro, Piso 5",
+  "city": "Ciudad de México",
+  "state": "CDMX",
+  "postal_code": "06000",
+  "country": "México",
+  "phone": "+52 55 1234 5678",
+  "is_default": true,
+  "full_address": "Av. Reforma 123, Col. Centro, Piso 5, Ciudad de México, CDMX 06000, México",
+  "created_at": "2024-01-15T10:30:00.000000Z",
+  "updated_at": "2024-01-15T10:30:00.000000Z"
+}
+```
+
+**Notas sobre el modelo de direcciones:**
+- El campo `type` define si es dirección de 'shipping' o 'billing'
+- Solo puede haber una dirección por defecto por tipo por usuario
+- El campo `full_name` es computado automáticamente a partir de `first_name` y `last_name`
+- El campo `full_address` es computado automáticamente con el formato completo de la dirección
+- Al crear/actualizar una dirección como `is_default: true`, automáticamente se marca como `false` cualquier otra dirección del mismo tipo
 
 ### vi. Pedidos (`/orders`)
 
