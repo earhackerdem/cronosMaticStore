@@ -121,6 +121,14 @@ class PaymentController extends Controller
             $result = $this->paypalService->captureOrder($request->paypal_order_id, $order);
 
             if ($result['success']) {
+                // Update order payment status
+                $this->orderService->updatePaymentStatus(
+                    $order->id,
+                    Order::PAYMENT_STATUS_PAID,
+                    $result['capture_id'],
+                    'paypal'
+                );
+
                 Log::info('PayPal order captured via API', [
                     'order_id' => $order->id,
                     'paypal_order_id' => $request->paypal_order_id,
@@ -134,7 +142,7 @@ class PaymentController extends Controller
                         'capture_id' => $result['capture_id'],
                         'status' => $result['status'],
                         'order_number' => $order->order_number,
-                        'payment_status' => Order::PAYMENT_STATUS_PAID
+                        'payment_status' => 'pagado'
                     ]
                 ]);
             }
@@ -204,7 +212,7 @@ class PaymentController extends Controller
                         'paypal_order_id' => $result['paypal_order_id'],
                         'capture_id' => $result['capture_id'],
                         'order_number' => $order->order_number,
-                        'payment_status' => Order::PAYMENT_STATUS_PAID
+                        'payment_status' => 'pagado'
                     ]
                 ]);
             }
@@ -269,7 +277,7 @@ class PaymentController extends Controller
                     'simulated' => true,
                     'paypal_order_id' => $result['paypal_order_id'],
                     'order_number' => $order->order_number,
-                    'payment_status' => Order::PAYMENT_STATUS_FAILED,
+                    'payment_status' => 'fallido',
                     'error' => $result['error']
                 ]
             ]);

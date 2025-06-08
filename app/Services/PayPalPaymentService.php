@@ -306,7 +306,7 @@ class PayPalPaymentService
             app(OrderService::class)->updatePaymentStatus(
                 $order->id,
                 Order::PAYMENT_STATUS_PAID,
-                $captureId,
+                $paypalOrderId,
                 'paypal'
             );
 
