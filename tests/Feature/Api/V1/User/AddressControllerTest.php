@@ -5,7 +5,7 @@ namespace Tests\Feature\Api\V1\User;
 use App\Models\Address;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Sanctum\Sanctum;
+// Removed Laravel\Sanctum\Sanctum import - now using web authentication
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -32,7 +32,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function authenticated_user_can_get_their_addresses(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         Address::factory()->count(3)->create(['user_id' => $this->user->id]);
 
@@ -68,7 +68,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function user_can_filter_addresses_by_type(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         Address::factory()->shipping()->count(2)->create(['user_id' => $this->user->id]);
         Address::factory()->billing()->create(['user_id' => $this->user->id]);
@@ -86,7 +86,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function addresses_are_ordered_by_default_first_then_created_at(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $oldAddress = Address::factory()->create([
             'user_id' => $this->user->id,
@@ -119,7 +119,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function user_can_create_new_address(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $addressData = [
             'type' => Address::TYPE_SHIPPING,
@@ -158,7 +158,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function address_creation_requires_valid_data(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $response = $this->postJson('/api/v1/user/addresses', []);
 
@@ -178,7 +178,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function address_type_must_be_valid(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $addressData = [
             'type' => 'invalid_type',
@@ -200,7 +200,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function user_can_view_specific_address(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $address = Address::factory()->create(['user_id' => $this->user->id]);
 
@@ -217,7 +217,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function user_cannot_view_other_users_address(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $otherUser = User::factory()->create();
         $address = Address::factory()->create(['user_id' => $otherUser->id]);
@@ -230,7 +230,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function user_can_update_their_address(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $address = Address::factory()->create(['user_id' => $this->user->id]);
 
@@ -260,7 +260,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function user_cannot_update_other_users_address(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $otherUser = User::factory()->create();
         $address = Address::factory()->create(['user_id' => $otherUser->id]);
@@ -275,7 +275,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function user_can_delete_their_address(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $address = Address::factory()->create(['user_id' => $this->user->id]);
 
@@ -294,7 +294,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function user_cannot_delete_other_users_address(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $otherUser = User::factory()->create();
         $address = Address::factory()->create(['user_id' => $otherUser->id]);
@@ -307,7 +307,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function user_can_set_address_as_default(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $defaultAddress = Address::factory()->shipping()->default()->create(['user_id' => $this->user->id]);
         $address = Address::factory()->shipping()->create(['user_id' => $this->user->id, 'is_default' => false]);
@@ -328,7 +328,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function user_cannot_set_other_users_address_as_default(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         $otherUser = User::factory()->create();
         $address = Address::factory()->create(['user_id' => $otherUser->id]);
@@ -341,7 +341,7 @@ class AddressControllerTest extends TestCase
     #[Test]
     public function user_only_sees_their_own_addresses(): void
     {
-        Sanctum::actingAs($this->user);
+        $this->actingAs($this->user);
 
         // Create addresses for current user
         Address::factory()->count(2)->create(['user_id' => $this->user->id]);
