@@ -13,7 +13,10 @@ class PublicProductApiTest extends TestCase
 
     public function test_can_get_all_active_public_products_paginated(): void
     {
-        Product::factory()->count(20)->create(['is_active' => true]);
+        // Clear any existing products first
+        Product::query()->delete();
+
+        $activeProducts = Product::factory()->count(20)->create(['is_active' => true]);
         Product::factory()->count(5)->create(['is_active' => false]);
 
         $response = $this->getJson('/api/v1/products?per_page=10'); // Paginación explícita para el test
@@ -102,6 +105,9 @@ class PublicProductApiTest extends TestCase
 
     public function test_can_sort_active_products(): void
     {
+        // Clear any existing products first
+        Product::query()->delete();
+
         Product::factory()->create(['name' => 'Product C', 'price' => 10.00, 'is_active' => true, 'created_at' => now()->subDays(2)]);
         Product::factory()->create(['name' => 'Product A', 'price' => 30.00, 'is_active' => true, 'created_at' => now()->subDays(1)]);
         Product::factory()->create(['name' => 'Product B', 'price' => 20.00, 'is_active' => true, 'created_at' => now()]);
