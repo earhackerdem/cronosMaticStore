@@ -44,7 +44,11 @@ class CategoryControllerTest extends TestCase
     public function test_admin_can_get_all_categories()
     {
         Sanctum::actingAs($this->adminUser, ['*']);
-        Category::factory()->count(3)->create();
+
+        // Clear any existing categories first
+        Category::query()->delete();
+
+        $categories = Category::factory()->count(3)->create();
 
         $response = $this->getJson(route('categories.index'));
 
@@ -57,6 +61,11 @@ class CategoryControllerTest extends TestCase
             'links',
             'meta'
         ]);
+
+        // Verify the categories are the ones we created
+        foreach ($categories as $category) {
+            $response->assertJsonFragment(['id' => $category->id]);
+        }
     }
 
     public function test_non_admin_cannot_get_all_categories()

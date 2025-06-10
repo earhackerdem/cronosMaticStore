@@ -30,7 +30,12 @@ class ProductControllerTest extends TestCase
     public function test_admin_can_list_products(): void
     {
         Sanctum::actingAs($this->adminUser);
-        Product::factory(3)->create(['category_id' => $this->category->id]);
+
+        // Clear any existing products first
+        Product::query()->delete();
+
+        // Create exactly 3 products
+        $products = Product::factory(3)->create(['category_id' => $this->category->id]);
 
         $response = $this->getJson(route('products.index'));
 
@@ -43,6 +48,11 @@ class ProductControllerTest extends TestCase
                 'links',
                 'meta'
             ]);
+
+        // Verify the products are the ones we created
+        foreach ($products as $product) {
+            $response->assertJsonFragment(['id' => $product->id]);
+        }
     }
 
     public function test_non_admin_cannot_list_products(): void
