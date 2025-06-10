@@ -13,13 +13,21 @@ class PublicCategoryApiTest extends TestCase
 
     public function test_can_get_all_active_public_categories(): void
     {
-        Category::factory()->count(3)->create(['is_active' => true]);
+        // Clear any existing categories first
+        Category::query()->delete();
+
+        $activeCategories = Category::factory()->count(3)->create(['is_active' => true]);
         Category::factory()->count(2)->create(['is_active' => false]);
 
         $response = $this->getJson('/api/v1/categories');
 
         $response->assertStatus(200)
             ->assertJsonCount(3, 'data');
+
+        // Verify the active categories are returned
+        foreach ($activeCategories as $category) {
+            $response->assertJsonFragment(['id' => $category->id]);
+        }
     }
 
     public function test_can_get_a_single_active_public_category_with_its_active_products(): void

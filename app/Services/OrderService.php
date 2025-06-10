@@ -82,6 +82,7 @@ class OrderService
                     'product_name' => $cartItem->product->name,
                     'quantity' => $cartItem->quantity,
                     'price_per_unit' => $cartItem->product->price,
+                    'total_price' => $cartItem->quantity * $cartItem->product->price,
                 ]);
 
                 // Reduce stock

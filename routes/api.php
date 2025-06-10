@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\User\AddressController;
 use App\Http\Controllers\Api\V1\PaymentController;
+use App\Http\Controllers\Api\V1\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +59,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/paypal/simulate-failure', [PaymentController::class, 'simulateFailedPayment'])->name('api.v1.payments.paypal.simulate.failure');
         Route::get('/paypal/verify-config', [PaymentController::class, 'verifyPayPalConfig'])->name('api.v1.payments.paypal.verify');
     });
+
+    // Order routes (available for both authenticated users and guests)
+    Route::post('/orders', [OrderController::class, 'store'])->name('api.v1.orders.store');
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
