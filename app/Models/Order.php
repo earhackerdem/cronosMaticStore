@@ -146,4 +146,33 @@ class Order extends Model
     {
         return $this->payment_status === self::PAYMENT_STATUS_PAID;
     }
+
+    /**
+     * Get the status label in Spanish.
+     */
+    public function getStatusLabel(): string
+    {
+        return match ($this->status) {
+            self::STATUS_PENDING_PAYMENT => 'Pendiente de pago',
+            self::STATUS_PROCESSING => 'Procesando',
+            self::STATUS_SHIPPED => 'Enviado',
+            self::STATUS_DELIVERED => 'Entregado',
+            self::STATUS_CANCELLED => 'Cancelado',
+            default => 'Desconocido',
+        };
+    }
+
+    /**
+     * Get the payment status label in Spanish.
+     */
+    public function getPaymentStatusLabel(): string
+    {
+        return match ($this->payment_status) {
+            self::PAYMENT_STATUS_PENDING => 'Pendiente',
+            self::PAYMENT_STATUS_PAID => 'Pagado',
+            self::PAYMENT_STATUS_FAILED => 'Fallido',
+            self::PAYMENT_STATUS_REFUNDED => 'Reembolsado',
+            default => 'Desconocido',
+        };
+    }
 }
