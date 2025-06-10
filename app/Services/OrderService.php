@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\OrderConfirmationMail;
 use App\Models\Address;
 use App\Models\Cart;
 use App\Models\Order;
@@ -11,6 +12,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class OrderService
@@ -153,7 +155,8 @@ class OrderService
             throw new \InvalidArgumentException("Invalid payment status: {$paymentStatus}");
         }
 
-        $order = Order::findOrFail($orderId);
+        $order = Order::with(['orderItems.product', 'shippingAddress', 'billingAddress', 'user'])
+            ->findOrFail($orderId);
 
         $updateData = ['payment_status' => $paymentStatus];
 
@@ -172,7 +175,12 @@ class OrderService
 
         $order->update($updateData);
 
-        return $order->fresh();
+        // Send order confirmation email when payment is successful
+        if ($paymentStatus === Order::PAYMENT_STATUS_PAID) {
+            $this->sendOrderConfirmationEmail($order->fresh(['orderItems.product', 'shippingAddress', 'billingAddress', 'user']));
+        }
+
+        return $order->fresh(['orderItems.product', 'shippingAddress', 'billingAddress', 'user']);
     }
 
     /**
@@ -307,5 +315,17 @@ class OrderService
             'total_amount' => $totalAmount,
             'items_count' => $cart->items->sum('quantity'),
         ];
+    }
+
+    /**
+     * Send order confirmation email.
+     */
+    private function sendOrderConfirmationEmail(Order $order): void
+    {
+        $email = $order->user->email ?? $order->guest_email;
+
+        if ($email) {
+            Mail::to($email)->send(new OrderConfirmationMail($order));
+        }
     }
 }
