@@ -121,7 +121,8 @@ class Address extends Model
 
         // When creating a new default address, unset other default addresses of the same type
         static::creating(function ($address) {
-            if ($address->is_default) {
+            if ($address->is_default && $address->user_id) {
+                // Only handle defaults for authenticated users, guest addresses don't need default logic
                 static::where('user_id', $address->user_id)
                     ->where('type', $address->type)
                     ->where('is_default', true)
@@ -131,7 +132,8 @@ class Address extends Model
 
         // When updating an address to default, unset other default addresses of the same type
         static::updating(function ($address) {
-            if ($address->is_default && $address->isDirty('is_default')) {
+            if ($address->is_default && $address->isDirty('is_default') && $address->user_id) {
+                // Only handle defaults for authenticated users, guest addresses don't need default logic
                 static::where('user_id', $address->user_id)
                     ->where('type', $address->type)
                     ->where('id', '!=', $address->id)
