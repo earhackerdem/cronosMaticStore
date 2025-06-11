@@ -129,12 +129,26 @@ class PayPalPaymentService
 
             Log::info('Capturing PayPal order', [
                 'order_id' => $order->id,
-                'paypal_order_id' => $paypalOrderId
+                'paypal_order_id' => $paypalOrderId,
+                'base_url' => $this->baseUrl
             ]);
 
+            // PayPal capture endpoint - follow official documentation
             $response = Http::withToken($accessToken)
-                ->withHeaders(['Content-Type' => 'application/json'])
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'Prefer' => 'return=representation'
+                ])
+                ->withBody('{}', 'application/json')
                 ->post("{$this->baseUrl}/v2/checkout/orders/{$paypalOrderId}/capture");
+
+            Log::info('PayPal capture response', [
+                'order_id' => $order->id,
+                'paypal_order_id' => $paypalOrderId,
+                'status' => $response->status(),
+                'response_body' => $response->body()
+            ]);
 
             if ($response->successful()) {
                 $data = $response->json();
