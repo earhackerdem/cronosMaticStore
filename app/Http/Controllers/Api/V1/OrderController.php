@@ -56,14 +56,17 @@ class OrderController extends Controller
                 }
 
                 // Create order
-                $user = Auth::guard('sanctum')->user();
+                $user = Auth::guard('sanctum')->user() ?? Auth::guard('web')->user();
 
                 if ($user) {
                     // Authenticated user flow
+                    $shippingAddressId = $request->validated('shipping_address_id');
+                    $billingAddressId = $request->validated('billing_address_id') ?? $shippingAddressId; // Use shipping address if billing not provided
+
                     $order = $this->orderService->createOrderFromCart(
                         cart: $cart,
-                        shippingAddressId: $request->validated('shipping_address_id'),
-                        billingAddressId: $request->validated('billing_address_id'),
+                        shippingAddressId: $shippingAddressId,
+                        billingAddressId: $billingAddressId,
                         guestEmail: null,
                         orderData: [
                             'shipping_cost' => $request->validated('shipping_cost', 0.00),
