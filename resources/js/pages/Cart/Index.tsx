@@ -273,9 +273,11 @@ export default function CartIndex() {
                                             <span data-testid="total-amount">{formatPrice(cart.total_amount)}</span>
                                         </div>
 
-                                        <Button className="w-full" size="lg" data-testid="checkout-button">
-                                            Proceder al pago
-                                        </Button>
+                                                                <Link href="/checkout">
+                            <Button className="w-full" size="lg" data-testid="checkout-button">
+                                Proceder al pago
+                            </Button>
+                        </Link>
 
                                         <p className="text-xs text-gray-600 text-center">
                                             Los impuestos se calcularán en el checkout

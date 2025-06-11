@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { addressAPI, CreateAddressData, UpdateAddressData } from '@/lib/address-api';
-import { Address } from '@/types';
+import { Address, SharedData } from '@/types';
 import { toast } from 'sonner';
+import { usePage } from '@inertiajs/react';
 
 export interface UseAddressesReturn {
     addresses: Address[];
@@ -15,11 +16,21 @@ export interface UseAddressesReturn {
 }
 
 export function useAddresses(type?: 'shipping' | 'billing'): UseAddressesReturn {
+    const { auth } = usePage<SharedData>().props;
+    const isAuthenticated = auth && auth.user;
+
     const [addresses, setAddresses] = useState<Address[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const refreshAddresses = useCallback(async () => {
+        // Skip API call for guest users
+        if (!isAuthenticated) {
+            setIsLoading(false);
+            setAddresses([]);
+            return;
+        }
+
         try {
             setIsLoading(true);
             setError(null);
@@ -28,13 +39,20 @@ export function useAddresses(type?: 'shipping' | 'billing'): UseAddressesReturn 
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Error loading addresses';
             setError(errorMessage);
-            toast.error('Error al cargar las direcciones');
+            console.warn('Address loading error (this is normal for guest users):', errorMessage);
+            setAddresses([]);
         } finally {
             setIsLoading(false);
         }
-    }, [type]);
+    }, [type, isAuthenticated]);
 
     const createAddress = useCallback(async (data: CreateAddressData): Promise<Address | null> => {
+        // Only allow address creation for authenticated users
+        if (!isAuthenticated) {
+            toast.error('Debes iniciar sesión para guardar direcciones');
+            return null;
+        }
+
         try {
             const newAddress = await addressAPI.createAddress(data);
             setAddresses(prev => [newAddress, ...prev]);
@@ -46,9 +64,14 @@ export function useAddresses(type?: 'shipping' | 'billing'): UseAddressesReturn 
             toast.error('Error al crear la dirección');
             return null;
         }
-    }, []);
+    }, [isAuthenticated]);
 
     const updateAddress = useCallback(async (id: number, data: UpdateAddressData): Promise<Address | null> => {
+        if (!isAuthenticated) {
+            toast.error('Debes iniciar sesión para modificar direcciones');
+            return null;
+        }
+
         try {
             const updatedAddress = await addressAPI.updateAddress(id, data);
             setAddresses(prev => prev.map(addr => addr.id === id ? updatedAddress : addr));
@@ -60,9 +83,14 @@ export function useAddresses(type?: 'shipping' | 'billing'): UseAddressesReturn 
             toast.error('Error al actualizar la dirección');
             return null;
         }
-    }, []);
+    }, [isAuthenticated]);
 
     const deleteAddress = useCallback(async (id: number): Promise<boolean> => {
+        if (!isAuthenticated) {
+            toast.error('Debes iniciar sesión para eliminar direcciones');
+            return false;
+        }
+
         try {
             await addressAPI.deleteAddress(id);
             setAddresses(prev => prev.filter(addr => addr.id !== id));
@@ -74,9 +102,14 @@ export function useAddresses(type?: 'shipping' | 'billing'): UseAddressesReturn 
             toast.error('Error al eliminar la dirección');
             return false;
         }
-    }, []);
+    }, [isAuthenticated]);
 
     const setAsDefault = useCallback(async (id: number): Promise<Address | null> => {
+        if (!isAuthenticated) {
+            toast.error('Debes iniciar sesión para gestionar direcciones');
+            return null;
+        }
+
         try {
             const updatedAddress = await addressAPI.setAsDefault(id);
             // Update both the target address and clear default from others of the same type
@@ -96,7 +129,7 @@ export function useAddresses(type?: 'shipping' | 'billing'): UseAddressesReturn 
             toast.error('Error al marcar la dirección como predeterminada');
             return null;
         }
-    }, []);
+    }, [isAuthenticated]);
 
     useEffect(() => {
         refreshAddresses();
