@@ -151,12 +151,7 @@ class CheckoutFlowTest extends TestCase
             'is_active' => true
         ]);
 
-        // Create a user to create addresses (addresses require user_id)
-        $user = User::factory()->create();
-        $shippingAddress = Address::factory()->create([
-            'user_id' => $user->id,
-            'type' => 'shipping'
-        ]);
+
 
         $cart = Cart::factory()->create([
             'user_id' => null,
@@ -173,15 +168,38 @@ class CheckoutFlowTest extends TestCase
             'total_price' => 1600.00
         ]);
 
-        // Act: Complete guest checkout
+        // Act: Complete guest checkout with address data
         $response = $this->withHeaders([
             'X-Session-ID' => 'guest-session-123'
         ])->postJson('/api/v1/orders', [
-            'shipping_address_id' => $shippingAddress->id,
             'payment_method' => 'paypal',
             'guest_email' => 'guest@example.com',
             'shipping_cost' => 50.00,
-            'shipping_method_name' => 'Envío Express'
+            'shipping_method_name' => 'Envío Express',
+            'shipping_address' => [
+                'first_name' => 'Juan',
+                'last_name' => 'Pérez',
+                'company' => '',
+                'address_line_1' => 'Calle Principal 123',
+                'address_line_2' => 'Apt 4B',
+                'city' => 'Ciudad de México',
+                'state' => 'CDMX',
+                'postal_code' => '01000',
+                'country' => 'México',
+                'phone' => '555-1234'
+            ],
+            'billing_address' => [
+                'first_name' => 'Juan',
+                'last_name' => 'Pérez',
+                'company' => '',
+                'address_line_1' => 'Calle Principal 123',
+                'address_line_2' => 'Apt 4B',
+                'city' => 'Ciudad de México',
+                'state' => 'CDMX',
+                'postal_code' => '01000',
+                'country' => 'México',
+                'phone' => '555-1234'
+            ]
         ]);
 
         // Assert: Order created successfully
@@ -195,14 +213,29 @@ class CheckoutFlowTest extends TestCase
         $this->assertDatabaseHas('orders', [
             'user_id' => null,
             'guest_email' => 'guest@example.com',
-            'shipping_address_id' => $shippingAddress->id,
-            'billing_address_id' => $shippingAddress->id, // Same as shipping for guest
             'status' => Order::STATUS_PROCESSING,
             'payment_status' => Order::PAYMENT_STATUS_PAID,
             'subtotal_amount' => 1600.00,
             'shipping_cost' => 50.00,
             'total_amount' => 1650.00,
             'shipping_method_name' => 'Envío Express'
+        ]);
+
+        // Verify temporary addresses were created
+        $this->assertDatabaseHas('addresses', [
+            'user_id' => null,
+            'type' => 'shipping',
+            'first_name' => 'Juan',
+            'last_name' => 'Pérez',
+            'address_line_1' => 'Calle Principal 123'
+        ]);
+
+        $this->assertDatabaseHas('addresses', [
+            'user_id' => null,
+            'type' => 'billing',
+            'first_name' => 'Juan',
+            'last_name' => 'Pérez',
+            'address_line_1' => 'Calle Principal 123'
         ]);
     }
 
