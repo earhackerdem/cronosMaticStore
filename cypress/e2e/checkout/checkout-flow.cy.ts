@@ -1,24 +1,24 @@
 describe('Checkout Flow E2E Tests', () => {
     beforeEach(() => {
         // Start fresh for each test
-        cy.exec('php artisan migrate:refresh --seed');
+        cy.exec('php artisan migrate:fresh --seed');
         cy.visit('/');
     });
 
     it('should complete full checkout flow for authenticated user', () => {
         // Step 1: Register/Login user
         cy.visit('/register');
-        cy.get('input[name="name"]').type('Juan Pérez');
-        cy.get('input[name="email"]').type('juan@example.com');
-        cy.get('input[name="password"]').type('password123');
-        cy.get('input[name="password_confirmation"]').type('password123');
+        cy.get('input#name').type('Juan Pérez');
+        cy.get('input#email').type('juan@example.com');
+        cy.get('input#password').type('password123');
+        cy.get('input#password_confirmation').type('password123');
         cy.get('button[type="submit"]').click();
 
         // Verify login successful
         cy.url().should('include', '/dashboard');
 
         // Step 2: Create shipping address
-        cy.visit('/settings/direcciones');
+        cy.visit('/settings/addresses');
         cy.get('[data-testid="add-address-button"]').click();
 
         cy.get('select[name="type"]').select('shipping');
@@ -91,8 +91,8 @@ describe('Checkout Flow E2E Tests', () => {
     it('should handle empty cart at checkout', () => {
         // Login first
         cy.visit('/login');
-        cy.get('input[name="email"]').type('test@example.com');
-        cy.get('input[name="password"]').type('password');
+        cy.get('input#email').type('test@example.com');
+        cy.get('input#password').type('password');
         cy.get('button[type="submit"]').click();
 
         // Try to access checkout with empty cart
@@ -106,8 +106,8 @@ describe('Checkout Flow E2E Tests', () => {
     it('should navigate between checkout steps correctly', () => {
         // Setup: Add product to cart and go to checkout
         cy.visit('/login');
-        cy.get('input[name="email"]').type('test@example.com');
-        cy.get('input[name="password"]').type('password');
+        cy.get('input#email').type('test@example.com');
+        cy.get('input#password').type('password');
         cy.get('button[type="submit"]').click();
 
         // Add product and go to checkout
@@ -149,8 +149,8 @@ describe('Checkout Flow E2E Tests', () => {
     it('should handle different billing address selection', () => {
         // Setup with user who has multiple addresses
         cy.visit('/login');
-        cy.get('input[name="email"]').type('user.with.addresses@example.com');
-        cy.get('input[name="password"]').type('password');
+        cy.get('input#email').type('user.with.addresses@example.com');
+        cy.get('input#password').type('password');
         cy.get('button[type="submit"]').click();
 
         // Add product and go to checkout
@@ -184,8 +184,8 @@ describe('Checkout Flow E2E Tests', () => {
     it('should show correct order summary', () => {
         // Setup and navigate to checkout
         cy.visit('/login');
-        cy.get('input[name="email"]').type('test@example.com');
-        cy.get('input[name="password"]').type('password');
+        cy.get('input#email').type('test@example.com');
+        cy.get('input#password').type('password');
         cy.get('button[type="submit"]').click();
 
         // Add multiple products
@@ -227,8 +227,8 @@ describe('Checkout Flow E2E Tests', () => {
     it('should handle shipping method selection', () => {
         // Setup and navigate to step 3
         cy.visit('/login');
-        cy.get('input[name="email"]').type('test@example.com');
-        cy.get('input[name="password"]').type('password');
+        cy.get('input#email').type('test@example.com');
+        cy.get('input#password').type('password');
         cy.get('button[type="submit"]').click();
 
         cy.visit('/produtos');
@@ -266,8 +266,8 @@ describe('Checkout Flow E2E Tests', () => {
     it('should show loading state during order creation', () => {
         // Setup complete checkout flow
         cy.visit('/login');
-        cy.get('input[name="email"]').type('test@example.com');
-        cy.get('input[name="password"]').type('password');
+        cy.get('input#email').type('test@example.com');
+        cy.get('input#password').type('password');
         cy.get('button[type="submit"]').click();
 
         cy.visit('/produtos');
@@ -296,8 +296,8 @@ describe('Checkout Flow E2E Tests', () => {
     it('should handle checkout progress bar correctly', () => {
         // Setup
         cy.visit('/login');
-        cy.get('input[name="email"]').type('test@example.com');
-        cy.get('input[name="password"]').type('password');
+        cy.get('input#email').type('test@example.com');
+        cy.get('input#password').type('password');
         cy.get('button[type="submit"]').click();
 
         cy.visit('/produtos');
