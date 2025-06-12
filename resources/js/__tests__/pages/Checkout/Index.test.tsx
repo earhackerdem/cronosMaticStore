@@ -12,7 +12,18 @@ describe('Checkout Flow Tests', () => {
         ];
 
         const canNavigateToStep = (targetStep: number, currentStep: number, steps: { completed: boolean }[]) => {
-            return targetStep <= currentStep || steps[targetStep - 1].completed;
+            // Can always navigate to current step or previous steps
+            if (targetStep <= currentStep) {
+                return true;
+            }
+
+            // Can navigate to next step only if previous step is completed
+            if (targetStep === currentStep + 1) {
+                return steps[currentStep - 1].completed;
+            }
+
+            // Cannot navigate to steps beyond the next one
+            return false;
         };
 
         expect(canNavigateToStep(1, 1, steps)).toBe(true);
