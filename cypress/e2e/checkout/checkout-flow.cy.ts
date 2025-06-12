@@ -154,7 +154,7 @@ describe('Checkout Flow E2E Tests', () => {
         cy.get('button[type="submit"]').click();
 
         // Add product and go to checkout
-        cy.visit('/produtos');
+        cy.visit('/productos');
         cy.get('[data-testid="product-card"]').first().click();
         cy.get('[data-testid="add-to-cart-button"]').click();
         cy.visit('/carrito');
@@ -189,7 +189,7 @@ describe('Checkout Flow E2E Tests', () => {
         cy.get('button[type="submit"]').click();
 
         // Add multiple products
-        cy.visit('/produtos');
+        cy.visit('/productos');
 
         // Add first product
         cy.get('[data-testid="product-card"]').first().click();
@@ -231,7 +231,7 @@ describe('Checkout Flow E2E Tests', () => {
         cy.get('input#password').type('password');
         cy.get('button[type="submit"]').click();
 
-        cy.visit('/produtos');
+        cy.visit('/productos');
         cy.get('[data-testid="product-card"]').first().click();
         cy.get('[data-testid="add-to-cart-button"]').click();
         cy.visit('/carrito');
@@ -270,7 +270,7 @@ describe('Checkout Flow E2E Tests', () => {
         cy.get('input#password').type('password');
         cy.get('button[type="submit"]').click();
 
-        cy.visit('/produtos');
+        cy.visit('/productos');
         cy.get('[data-testid="product-card"]').first().click();
         cy.get('[data-testid="add-to-cart-button"]').click();
         cy.visit('/carrito');
@@ -300,7 +300,7 @@ describe('Checkout Flow E2E Tests', () => {
         cy.get('input#password').type('password');
         cy.get('button[type="submit"]').click();
 
-        cy.visit('/produtos');
+        cy.visit('/productos');
         cy.get('[data-testid="product-card"]').first().click();
         cy.get('[data-testid="add-to-cart-button"]').click();
         cy.visit('/carrito');
