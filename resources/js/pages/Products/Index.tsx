@@ -54,7 +54,7 @@ export default function ProductsIndex({ products, categories, filters }: Product
 
     // Componente de tarjeta de producto
     const ProductCard = ({ product }: { product: Product }) => (
-        <Card className="group hover:shadow-lg transition-shadow duration-200">
+        <Card className="group hover:shadow-lg transition-shadow duration-200" data-testid="product-card">
             <CardHeader className="p-0">
                 <div className="aspect-square overflow-hidden rounded-t-lg bg-gray-100">
                     {product.image_url ? (
