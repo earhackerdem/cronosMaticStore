@@ -528,6 +528,7 @@ export default function CheckoutIndex() {
                                                                             : 'border-gray-200 hover:border-gray-300'
                                                                     }`}
                                                                     onClick={() => handleSelectShippingAddress(address)}
+                                                                    data-testid="shipping-address"
                                                                 >
                                                                     <div className="flex items-start justify-between">
                                                                         <div>
@@ -650,6 +651,7 @@ export default function CheckoutIndex() {
                                                                                 : 'border-gray-200 hover:border-gray-300'
                                                                         }`}
                                                                         onClick={() => handleSelectBillingAddress(address)}
+                                                                        data-testid="billing-address"
                                                                     >
                                                                         <div className="flex items-start justify-between">
                                                                             <div>
@@ -711,6 +713,7 @@ export default function CheckoutIndex() {
                                                         : 'border-gray-200 hover:border-gray-300'
                                                 }`}
                                                 onClick={() => setShippingMethod('standard')}
+                                                data-testid="shipping-method-standard"
                                             >
                                                 <div className="flex items-center justify-between">
                                                     <div>
@@ -730,6 +733,7 @@ export default function CheckoutIndex() {
                                                         : 'border-gray-200 hover:border-gray-300'
                                                 }`}
                                                 onClick={() => setShippingMethod('express')}
+                                                data-testid="shipping-method-express"
                                             >
                                                 <div className="flex items-center justify-between">
                                                     <div>
@@ -855,7 +859,7 @@ export default function CheckoutIndex() {
 
                         {/* Sidebar - Resumen del pedido */}
                         <div className="lg:col-span-1">
-                            <Card className="sticky top-4">
+                            <Card className="sticky top-4" data-testid="order-summary">
                                 <CardHeader>
                                     <CardTitle>Resumen del pedido</CardTitle>
                                 </CardHeader>
@@ -874,7 +878,7 @@ export default function CheckoutIndex() {
 
                                     <div className="flex justify-between text-lg font-semibold">
                                         <span>Total</span>
-                                        <span>{formatPrice(cart?.total_amount || 0)}</span>
+                                        <span data-testid="total-amount">{formatPrice(cart?.total_amount || 0)}</span>
                                     </div>
 
                                     <div className="text-xs text-gray-600 text-center">

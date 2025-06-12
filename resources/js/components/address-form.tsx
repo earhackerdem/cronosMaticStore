@@ -162,6 +162,7 @@ export function AddressForm({
                     <div className="space-y-2">
                         <Label htmlFor="type">Tipo de dirección</Label>
                         <Select
+                            name="type"
                             value={watchedType}
                             onValueChange={(value: 'shipping' | 'billing') => setValue('type', value)}
                         >
