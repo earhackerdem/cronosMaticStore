@@ -26,6 +26,7 @@ const Progress = ({ value, className }: { value: number; className?: string }) =
         <div
             className="bg-blue-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${value}%` }}
+            data-testid="progress-bar"
         />
     </div>
 );
@@ -448,11 +449,12 @@ export default function CheckoutIndex() {
                                             step.completed ? 'text-green-600' : 'text-gray-400'
                                         }`}
                                         onClick={() => goToStep(step.id)}
+                                        data-testid={`step-indicator-${step.id}`}
                                     >
                                         <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
                                             step.id === currentStep ? 'bg-blue-100 border-2 border-blue-600' :
                                             step.completed ? 'bg-green-100 border-2 border-green-600' : 'bg-gray-100'
-                                        }`}>
+                                        }`} data-testid={`step-icon-${step.id}`}>
                                             {step.icon}
                                         </div>
                                         <span className="text-sm font-medium text-center">{step.title}</span>
@@ -495,7 +497,7 @@ export default function CheckoutIndex() {
 
                             {/* Paso 1: Dirección de envío */}
                             {currentStep === 1 && (
-                                <Card>
+                                <Card data-testid="step-1">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
                                             <MapPin className="w-5 h-5" />
@@ -597,7 +599,7 @@ export default function CheckoutIndex() {
 
                             {/* Paso 2: Dirección de facturación */}
                             {currentStep === 2 && (
-                                <Card>
+                                <Card data-testid="step-2">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
                                             <Receipt className="w-5 h-5" />
@@ -693,7 +695,7 @@ export default function CheckoutIndex() {
 
                             {/* Paso 3: Método de envío */}
                             {currentStep === 3 && (
-                                <Card>
+                                <Card data-testid="step-3">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
                                             <Truck className="w-5 h-5" />
@@ -755,7 +757,7 @@ export default function CheckoutIndex() {
 
                             {/* Paso 4: Resumen y pago */}
                             {currentStep === 4 && (
-                                <Card>
+                                <Card data-testid="step-4">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
                                             <CreditCard className="w-5 h-5" />
