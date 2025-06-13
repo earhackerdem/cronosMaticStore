@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Api\V1\User\AddressController as ApiAddressController;
+use App\Http\Controllers\Web\UserOrderController as WebUserOrderController;
 use App\Http\Controllers\PaymentReturnController;
 
 Route::get('/', function () {
@@ -50,6 +51,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'orderNumber' => $orderNumber
         ]);
     })->name('user.orders.show');
+
+    // AJAX routes for user orders data
+    Route::prefix('ajax/user')->group(function () {
+        Route::get('/orders', [WebUserOrderController::class, 'index'])->name('ajax.user.orders.index');
+        Route::get('/orders/{order_number}', [WebUserOrderController::class, 'show'])->name('ajax.user.orders.show');
+    });
 
     // Address management routes (API-style but with web authentication)
     Route::prefix('api/v1/user')->group(function () {
