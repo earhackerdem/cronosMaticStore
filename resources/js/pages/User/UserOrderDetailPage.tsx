@@ -211,7 +211,7 @@ export default function UserOrderDetailPage({ orderNumber }: UserOrderDetailPage
                         <div className="bg-white rounded-lg shadow-sm p-6">
                             <div className="space-y-3">
                                 <Link
-                                    href="/"
+                                    href="/productos"
                                     className="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                 >
                                     Seguir Comprando
