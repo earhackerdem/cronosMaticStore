@@ -152,17 +152,11 @@ export default function CartIndex() {
                                                     {/* Imagen del producto */}
                                                     <div className="flex-shrink-0">
                                                         <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden">
-                                                            {item.product.image_url ? (
-                                                                <img
-                                                                    src={item.product.image_url}
-                                                                    alt={item.product.name}
-                                                                    className="w-full h-full object-cover"
-                                                                />
-                                                            ) : (
-                                                                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                                    <Package className="w-8 h-8" />
-                                                                </div>
-                                                            )}
+                                                            <img
+                                                                src={item.product.image_url}
+                                                                alt={item.product.name}
+                                                                className="w-full h-full object-cover"
+                                                            />
                                                         </div>
                                                     </div>
 

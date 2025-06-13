@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\User\AddressController;
+use App\Http\Controllers\Api\V1\User\OrderController as UserOrderController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\OrderController;
 
@@ -68,6 +69,12 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth-status', [HealthCheckController::class, 'authStatus']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/user', [AuthController::class, 'user']);
+
+        // User protected routes
+        Route::prefix('user')->group(function () {
+            Route::get('/orders', [UserOrderController::class, 'index'])->name('api.v1.user.orders.index');
+            Route::get('/orders/{order_number}', [UserOrderController::class, 'show'])->name('api.v1.user.orders.show');
+        });
 
         // Admin protected routes
         Route::prefix('admin')->middleware('admin')->group(function () {

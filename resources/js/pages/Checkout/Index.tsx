@@ -798,15 +798,11 @@ export default function CheckoutIndex() {
                                                     <div key={item.id} className="flex justify-between items-center py-2 border-b border-gray-100">
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-12 h-12 bg-gray-100 rounded overflow-hidden">
-                                                                {item.product.image_url ? (
-                                                                    <img
-                                                                        src={item.product.image_url}
-                                                                        alt={item.product.name}
-                                                                        className="w-full h-full object-cover"
-                                                                    />
-                                                                ) : (
-                                                                    <div className="w-full h-full bg-gray-200" />
-                                                                )}
+                                                                <img
+                                                                    src={item.product.image_url}
+                                                                    alt={item.product.name}
+                                                                    className="w-full h-full object-cover"
+                                                                />
                                                             </div>
                                                             <div>
                                                                 <p className="font-medium text-sm">{item.product.name}</p>

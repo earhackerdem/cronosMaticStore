@@ -57,20 +57,11 @@ export default function ProductShow({ product }: ProductShowProps) {
                             <Card>
                                 <CardContent className="p-0">
                                     <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
-                                        {product.image_url ? (
-                                            <img
-                                                src={product.image_url}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                <div className="text-center">
-                                                    <Package className="w-24 h-24 mx-auto mb-4" />
-                                                    <p className="text-lg">Sin imagen disponible</p>
-                                                </div>
-                                            </div>
-                                        )}
+                                        <img
+                                            src={product.image_url}
+                                            alt={product.name}
+                                            className="w-full h-full object-cover"
+                                        />
                                     </div>
                                 </CardContent>
                             </Card>

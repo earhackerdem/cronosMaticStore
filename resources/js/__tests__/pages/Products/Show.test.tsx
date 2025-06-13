@@ -127,7 +127,7 @@ describe('ProductShow', () => {
         name: 'Reloj Sin Imagen',
         slug: 'reloj-sin-imagen',
         image_path: null,
-        image_url: null,
+        image_url: 'https://img.chrono24.com/images/uhren/26900830-3i5ennqwbi0zcqufcqyxjs5v-Zoom.jpg', // Imagen por defecto basada en ID=4
     };
 
     const mockProductMinimalData: Product = {
@@ -141,7 +141,7 @@ describe('ProductShow', () => {
         brand: null,
         movement_type: null,
         image_path: null,
-        image_url: null,
+        image_url: 'https://img.chrono24.com/images/uhren/40851974-em5oh9xyb3j849bffkxv8rls-Zoom.jpg', // Imagen por defecto basada en ID=5
         is_active: true,
         category: null,
         created_at: '2024-01-01T00:00:00.000000Z',
@@ -184,11 +184,16 @@ describe('ProductShow', () => {
             expect(screen.getByText('CASIO-GSHOCK-001')).toBeInTheDocument();
         });
 
-        it('AC3: Maneja producto sin imagen elegantemente', () => {
+        it('AC3: Maneja producto sin imagen mostrando imagen por defecto', () => {
             render(<ProductShow product={mockProductWithoutImage} />);
 
-            expect(screen.getByText('Sin imagen disponible')).toBeInTheDocument();
-            expect(screen.queryByAltText('Reloj Sin Imagen')).not.toBeInTheDocument();
+            // Verificar que muestra la imagen por defecto en lugar de "Sin imagen disponible"
+            const image = screen.getByAltText('Reloj Sin Imagen');
+            expect(image).toBeInTheDocument();
+            expect(image).toHaveAttribute('src', 'https://img.chrono24.com/images/uhren/26900830-3i5ennqwbi0zcqufcqyxjs5v-Zoom.jpg');
+
+            // Ya no debe mostrar "Sin imagen disponible"
+            expect(screen.queryByText('Sin imagen disponible')).not.toBeInTheDocument();
         });
 
         it('Maneja producto con datos mínimos', () => {

@@ -13,7 +13,7 @@ export const createMockProduct = (overrides: Partial<Record<string, unknown>> = 
   movement_type: 'Quartz',
   image_path: null,
   sku: 'TEST001',
-  image_url: null,
+  image_url: 'https://img.chrono24.com/images/uhren/40851974-em5oh9xyb3j849bffkxv8rls-Zoom.jpg', // Imagen por defecto para ID=1
   is_active: true,
   created_at: '2024-01-01T00:00:00.000000Z',
   updated_at: '2024-01-01T00:00:00.000000Z',
