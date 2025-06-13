@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Exception;
 
 class OrderController extends Controller
@@ -55,18 +56,43 @@ class OrderController extends Controller
                 }
 
                 // Create order
-                $order = $this->orderService->createOrderFromCart(
-                    cart: $cart,
-                    shippingAddressId: $request->validated('shipping_address_id'),
-                    billingAddressId: $request->validated('billing_address_id'),
-                    guestEmail: $request->validated('guest_email'),
-                    orderData: [
-                        'shipping_cost' => $request->validated('shipping_cost', 0.00),
-                        'shipping_method_name' => $request->validated('shipping_method_name'),
-                        'payment_gateway' => 'paypal',
-                        'notes' => $request->validated('notes'),
-                    ]
-                );
+                $user = Auth::guard('sanctum')->user() ?? Auth::guard('web')->user();
+
+                if ($user) {
+                    // Authenticated user flow
+                    $shippingAddressId = $request->validated('shipping_address_id');
+                    $billingAddressId = $request->validated('billing_address_id') ?? $shippingAddressId; // Use shipping address if billing not provided
+
+                    $order = $this->orderService->createOrderFromCart(
+                        cart: $cart,
+                        shippingAddressId: $shippingAddressId,
+                        billingAddressId: $billingAddressId,
+                        guestEmail: null,
+                        orderData: [
+                            'shipping_cost' => $request->validated('shipping_cost', 0.00),
+                            'shipping_method_name' => $request->validated('shipping_method_name'),
+                            'payment_gateway' => 'paypal',
+                            'notes' => $request->validated('notes'),
+                        ]
+                    );
+                } else {
+                    // Guest user flow - create temporary addresses
+                    $shippingAddress = $this->createTemporaryAddress($request->validated('shipping_address'), 'shipping');
+                    $billingAddress = $this->createTemporaryAddress($request->validated('billing_address'), 'billing');
+
+                    $order = $this->orderService->createOrderFromCart(
+                        cart: $cart,
+                        shippingAddressId: $shippingAddress->id,
+                        billingAddressId: $billingAddress->id,
+                        guestEmail: $request->validated('guest_email'),
+                        orderData: [
+                            'shipping_cost' => $request->validated('shipping_cost', 0.00),
+                            'shipping_method_name' => $request->validated('shipping_method_name'),
+                            'payment_gateway' => 'paypal',
+                            'notes' => $request->validated('notes'),
+                        ]
+                    );
+                }
 
                 // Process payment
                 $paymentResult = $this->processPayment($order, $request->validated('payment_method'));
@@ -91,7 +117,20 @@ class OrderController extends Controller
                 );
 
                 // Clear cart after successful order
-                $this->cartService->clearCart($cart);
+                Log::info('Clearing cart after successful order', [
+                    'cart_id' => $cart->id,
+                    'cart_items_before' => $cart->items->count(),
+                    'order_id' => $order->id
+                ]);
+
+                $clearResult = $this->cartService->clearCart($cart);
+
+                Log::info('Cart cleared result', [
+                    'cart_id' => $cart->id,
+                    'clear_result' => $clearResult,
+                    'cart_items_after' => $cart->fresh()->items->count(),
+                    'order_id' => $order->id
+                ]);
 
                 // Load relationships for response
                 $order = $order->load(['orderItems.product', 'shippingAddress', 'billingAddress', 'user']);
@@ -122,7 +161,7 @@ class OrderController extends Controller
             Log::error('Error creating order', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-                'user_id' => Auth::guard('sanctum')->id(),
+                'user_id' => Auth::guard('sanctum')->id() ?? Auth::guard('web')->id(),
                 'request_data' => $request->validated()
             ]);
 
@@ -139,18 +178,37 @@ class OrderController extends Controller
      */
     private function getCurrentCart(Request $request)
     {
-        $user = Auth::guard('sanctum')->user();
+        // Check both sanctum (API) and web (session) authentication
+        $user = Auth::guard('sanctum')->user() ?? Auth::guard('web')->user();
 
         if ($user) {
             return $this->cartService->getOrCreateCartForUser($user->id);
         }
 
-        // For guest users, try to get session ID from multiple sources
-        $sessionId = $request->session()->getId();
+                // For guest users, try to get session ID from multiple sources
+        $sessionId = null;
 
-        // Fallback: if no session ID, use a default one for API requests
+        // First priority: Use the session ID sent from frontend (X-Session-ID header)
+        $sessionId = $request->header('X-Session-ID');
+
+        // Second priority: Try to get session ID safely from Laravel session
         if (!$sessionId) {
-            $sessionId = $request->header('X-Session-ID', 'default-api-session');
+            try {
+                if ($request->hasSession()) {
+                    $sessionId = $request->session()->getId();
+                }
+            } catch (Exception $e) {
+                // Sessions might not be available in API routes
+                Log::info('Session not available for API request, using fallback', ['error' => $e->getMessage()]);
+            }
+        }
+
+        // Last resort: generate a new session ID
+        if (!$sessionId) {
+            $sessionId = 'guest_' . time() . '_' . Str::random(8);
+            Log::info('Generated new session ID for guest user', ['session_id' => $sessionId]);
+        } else {
+            Log::info('Using existing session ID for guest user', ['session_id' => $sessionId]);
         }
 
         return $this->cartService->getOrCreateCartForGuest($sessionId);
@@ -164,13 +222,22 @@ class OrderController extends Controller
         try {
             switch ($paymentMethod) {
                 case 'paypal':
-                    // For development/testing, we'll simulate payment
-                    // In production, this would integrate with PayPal's actual API
+                    // Check if we should simulate payments
                     if (config('app.env') === 'testing' || config('services.paypal.simulate_payments', false)) {
+                        Log::info('Using PayPal payment simulation', [
+                            'order_id' => $order->id,
+                            'simulate_payments' => config('services.paypal.simulate_payments'),
+                            'app_env' => config('app.env')
+                        ]);
                         return $this->paymentService->simulateSuccessfulPayment($order);
                     }
 
-                    // Real PayPal payment processing would go here
+                    // Real PayPal payment processing
+                    Log::info('Using real PayPal payment processing', [
+                        'order_id' => $order->id,
+                        'simulate_payments' => config('services.paypal.simulate_payments'),
+                        'app_env' => config('app.env')
+                    ]);
                     return $this->paymentService->processPayment($order);
 
                 default:
@@ -191,5 +258,27 @@ class OrderController extends Controller
                 'error' => 'Error al procesar el pago: ' . $e->getMessage()
             ];
         }
+    }
+
+    /**
+     * Create a temporary address for guest users.
+     */
+    private function createTemporaryAddress(array $addressData, string $type): \App\Models\Address
+    {
+        return \App\Models\Address::create([
+            'user_id' => null, // Guest address
+            'type' => $type,
+            'first_name' => $addressData['first_name'],
+            'last_name' => $addressData['last_name'],
+            'company' => $addressData['company'] ?? '',
+            'address_line_1' => $addressData['address_line_1'],
+            'address_line_2' => $addressData['address_line_2'] ?? '',
+            'city' => $addressData['city'],
+            'state' => $addressData['state'],
+            'postal_code' => $addressData['postal_code'],
+            'country' => $addressData['country'],
+            'phone' => $addressData['phone'] ?? '',
+            'is_default' => false,
+        ]);
     }
 }

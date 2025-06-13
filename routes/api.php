@@ -43,7 +43,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
 
     // Cart routes (disponibles para usuarios autenticados e invitados)
-    Route::prefix('cart')->group(function () {
+    Route::prefix('cart')->middleware(['web'])->group(function () {
         Route::get('/', [CartController::class, 'show'])->name('api.v1.cart.show');
         Route::post('/items', [CartController::class, 'addItem'])->name('api.v1.cart.items.add');
         Route::put('/items/{cart_item_id}', [CartController::class, 'updateItem'])->name('api.v1.cart.items.update');
@@ -61,7 +61,7 @@ Route::prefix('v1')->group(function () {
     });
 
     // Order routes (available for both authenticated users and guests)
-    Route::post('/orders', [OrderController::class, 'store'])->name('api.v1.orders.store');
+    Route::post('/orders', [OrderController::class, 'store'])->middleware(['web'])->name('api.v1.orders.store');
 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {

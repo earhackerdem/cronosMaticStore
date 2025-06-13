@@ -98,7 +98,7 @@ export default function Addresses() {
                             title="Libreta de Direcciones"
                             description="Gestiona tus direcciones de envío y facturación"
                         />
-                        <Button onClick={handleCreateAddress}>
+                        <Button onClick={handleCreateAddress} data-testid="add-address-button">
                             <Plus className="mr-2 h-4 w-4" />
                             Nueva Dirección
                         </Button>

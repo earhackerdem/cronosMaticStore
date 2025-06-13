@@ -19,6 +19,18 @@ Route::get('/carrito', function () {
     return Inertia::render('Cart/Index');
 })->name('web.cart.index');
 
+// Ruta del checkout
+Route::get('/checkout', function () {
+    return Inertia::render('Checkout/Index');
+})->name('web.checkout.index');
+
+// Ruta de confirmación de orden
+Route::get('/orders/confirmation/{orderNumber}', function ($orderNumber) {
+    return Inertia::render('Orders/Confirmation', [
+        'orderNumber' => $orderNumber
+    ]);
+})->name('web.orders.confirmation');
+
 // PayPal return routes
 Route::get('/orders/payment/success', [PaymentReturnController::class, 'success'])->name('orders.payment.success');
 Route::get('/orders/payment/cancel', [PaymentReturnController::class, 'cancel'])->name('orders.payment.cancel');

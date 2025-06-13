@@ -35,7 +35,7 @@ export function AddressCard({
             "relative transition-all duration-200 hover:shadow-md",
             address.is_default && "ring-2 ring-primary/20",
             isLoading && "opacity-50 pointer-events-none"
-        )}>
+        )} data-testid="address-card">
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
