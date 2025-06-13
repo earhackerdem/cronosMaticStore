@@ -40,6 +40,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
+    // User orders routes
+    Route::get('/user/orders', function () {
+        return Inertia::render('User/UserOrdersPage');
+    })->name('user.orders.index');
+
+    Route::get('/user/orders/{orderNumber}', function ($orderNumber) {
+        return Inertia::render('User/UserOrderDetailPage', [
+            'orderNumber' => $orderNumber
+        ]);
+    })->name('user.orders.show');
+
     // Address management routes (API-style but with web authentication)
     Route::prefix('api/v1/user')->group(function () {
         Route::get('/addresses', [ApiAddressController::class, 'index']);
