@@ -64,7 +64,7 @@ export interface Product {
     brand: string | null;
     movement_type: string | null;
     image_path: string | null;
-    image_url: string | null;
+    image_url: string; // Ahora siempre es string, nunca null
     is_active: boolean;
     category: Category | null;
     created_at: string;
