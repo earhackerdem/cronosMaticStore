@@ -268,14 +268,22 @@ class ProductControllerTest extends TestCase
         // Act
         $response = $this->get(route('web.products.show', $product->slug));
 
-        // Assert: Verificar que image_url es null cuando no hay imagen
+        // Assert: Verificar que image_url devuelve una imagen por defecto cuando no hay imagen
         $response->assertStatus(200);
 
         $response->assertInertia(fn (Assert $page) => $page
             ->component('Products/Show')
             ->has('product', fn (Assert $productAssert) => $productAssert
                 ->where('image_path', null)
-                ->where('image_url', null)
+                ->where('image_url', function ($imageUrl) {
+                    // Verificar que devuelve una de las imágenes por defecto de Chrono24
+                    $defaultImages = [
+                        'https://img.chrono24.com/images/uhren/39539607-m9too3m1kpkrqpnnxklsvnxp-Zoom.jpg',
+                        'https://img.chrono24.com/images/uhren/40851974-em5oh9xyb3j849bffkxv8rls-Zoom.jpg',
+                        'https://img.chrono24.com/images/uhren/26900830-3i5ennqwbi0zcqufcqyxjs5v-Zoom.jpg',
+                    ];
+                    return in_array($imageUrl, $defaultImages);
+                })
                 ->etc()
             )
         );
