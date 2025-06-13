@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { CheckCircle, Package, Truck, Download, ArrowLeft } from 'lucide-react';
+import { CheckCircle, Package, Truck, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -108,10 +108,12 @@ export default function Confirmation({ orderNumber }: ConfirmationProps) {
 
                         {/* Actions */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Button variant="outline" className="flex items-center gap-2">
-                                <Download className="w-4 h-4" />
-                                Descargar factura
-                            </Button>
+                            <Link href="/user/orders">
+                                <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
+                                    <Package className="w-4 h-4" />
+                                    Mis pedidos
+                                </Button>
+                            </Link>
                             <Link href="/productos">
                                 <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
                                     Seguir comprando
