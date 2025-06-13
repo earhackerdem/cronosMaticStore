@@ -29,20 +29,20 @@ export default function UserOrderDetailPage({ orderNumber }: UserOrderDetailPage
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchOrder = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const response = await UserOrderApi.getUserOrder(orderNumber);
-            setOrder(response.data.order);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Error al cargar el pedido');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
+        const fetchOrder = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const response = await UserOrderApi.getUserOrder(orderNumber);
+                setOrder(response.data.order);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Error al cargar el pedido');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchOrder();
     }, [orderNumber]);
 
