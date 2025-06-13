@@ -27,7 +27,7 @@ class ProductResource extends JsonResource
             'brand' => $this->brand,
             'movement_type' => $this->movement_type,
             'image_path' => $this->image_path,
-            'image_url' => $this->image_path ? Storage::url($this->image_path) : null,
+            'image_url' => $this->image_url,
             'is_active' => (bool) $this->is_active,
             'category' => new CategoryResource($this->whenLoaded('category')),
             'created_at' => $this->created_at->toDateTimeString(),
