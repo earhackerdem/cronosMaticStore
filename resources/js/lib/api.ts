@@ -1,4 +1,4 @@
-import { Cart } from '@/types';
+import { Cart, Order, OrdersPaginatedResponse } from '@/types';
 
 interface ApiResponse<T> {
     success: boolean;
@@ -130,5 +130,61 @@ export class CartApi {
      */
     static setSessionId(sessionId: string): void {
         localStorage.setItem('cart_session_id', sessionId);
+    }
+}
+
+export class UserOrderApi {
+    private static baseUrl = '/api/v1/user/orders';
+
+    private static getHeaders(): Record<string, string> {
+        const token = document.querySelector('meta[name="auth-token"]')?.getAttribute('content') ||
+                     localStorage.getItem('auth_token');
+
+        return {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            ...(token && { 'Authorization': `Bearer ${token}` }),
+        };
+    }
+
+    private static async handleResponse<T>(response: Response): Promise<T> {
+        if (!response.ok) {
+            if (response.status === 401) {
+                // Redirect to login or handle authentication error
+                window.location.href = '/login';
+                throw new Error('No autorizado');
+            }
+
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error en la petición');
+        }
+
+        const data = await response.json();
+        if (!data.success) {
+            throw new Error(data.message || 'Error en la respuesta del servidor');
+        }
+
+        return data;
+    }
+
+    static async getUserOrders(page: number = 1, perPage: number = 15): Promise<OrdersPaginatedResponse> {
+        const response = await fetch(`${this.baseUrl}?page=${page}&per_page=${perPage}`, {
+            method: 'GET',
+            headers: this.getHeaders(),
+            credentials: 'same-origin',
+        });
+
+        return this.handleResponse<OrdersPaginatedResponse>(response);
+    }
+
+    static async getUserOrder(orderNumber: string): Promise<{ success: boolean; data: { order: Order } }> {
+        const response = await fetch(`${this.baseUrl}/${orderNumber}`, {
+            method: 'GET',
+            headers: this.getHeaders(),
+            credentials: 'same-origin',
+        });
+
+        return this.handleResponse<{ success: boolean; data: { order: Order } }>(response);
     }
 }
