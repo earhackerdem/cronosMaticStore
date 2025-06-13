@@ -132,8 +132,12 @@ export default function UserOrderDetailPage({ orderNumber }: UserOrderDetailPage
                             <div className="space-y-4">
                                 {order.order_items?.map((item) => (
                                     <div key={item.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
-                                        <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                                            <Package className="w-6 h-6 text-gray-400" />
+                                        <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
+                                            <img
+                                                src={item.product.image_url}
+                                                alt={item.product.name}
+                                                className="w-full h-full object-cover"
+                                            />
                                         </div>
 
                                         <div className="flex-1">

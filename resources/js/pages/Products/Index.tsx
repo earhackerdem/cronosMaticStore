@@ -57,22 +57,11 @@ export default function ProductsIndex({ products, categories, filters }: Product
         <Card className="group hover:shadow-lg transition-shadow duration-200" data-testid="product-card">
             <CardHeader className="p-0">
                 <div className="aspect-square overflow-hidden rounded-t-lg bg-gray-100">
-                    {product.image_url ? (
-                        <img
-                            src={product.image_url}
-                            alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <div className="text-center">
-                                <div className="w-16 h-16 mx-auto mb-2 bg-gray-200 rounded-full flex items-center justify-center">
-                                    <Search className="w-8 h-8" />
-                                </div>
-                                <p className="text-sm">Sin imagen</p>
-                            </div>
-                        </div>
-                    )}
+                    <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    />
                 </div>
             </CardHeader>
             <CardContent className="p-4">
@@ -127,17 +116,11 @@ export default function ProductsIndex({ products, categories, filters }: Product
             <CardContent className="p-4">
                 <div className="flex gap-4">
                     <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                        {product.image_url ? (
-                            <img
-                                src={product.image_url}
-                                alt={product.name}
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                <Search className="w-6 h-6" />
-                            </div>
-                        )}
+                        <img
+                            src={product.image_url}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                        />
                     </div>
                     <div className="flex-1 space-y-2">
                         <div className="flex items-start justify-between">
