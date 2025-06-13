@@ -156,3 +156,59 @@ export interface Address {
     created_at: string;
     updated_at: string;
 }
+
+// Order interfaces
+export interface OrderItem {
+    id: number;
+    order_id: number;
+    product_id: number;
+    quantity: number;
+    unit_price: string;
+    total_price: string;
+    created_at: string;
+    updated_at: string;
+    product: Product;
+}
+
+export interface Order {
+    id: number;
+    order_number: string;
+    status: 'pendiente_pago' | 'procesando' | 'enviado' | 'entregado' | 'cancelado';
+    payment_status: 'pendiente' | 'pagado' | 'fallido' | 'reembolsado';
+    subtotal_amount: string;
+    shipping_cost: string;
+    total_amount: string;
+    payment_gateway?: string | null;
+    payment_id?: string | null;
+    shipping_method_name?: string | null;
+    notes?: string | null;
+    created_at: string;
+    updated_at: string;
+    user?: {
+        id: number;
+        name: string;
+        email: string;
+    } | null;
+    guest_email?: string | null;
+    shipping_address?: Address | null;
+    billing_address?: Address | null;
+    order_items?: OrderItem[];
+    can_be_cancelled?: boolean;
+    status_label: string;
+    payment_status_label: string;
+}
+
+export interface OrdersPaginatedResponse {
+    success: boolean;
+    data: {
+        orders: Order[];
+        pagination: {
+            current_page: number;
+            per_page: number;
+            total: number;
+            last_page: number;
+            from: number | null;
+            to: number | null;
+        };
+    };
+}
