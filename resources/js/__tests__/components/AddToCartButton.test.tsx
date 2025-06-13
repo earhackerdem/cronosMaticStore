@@ -19,7 +19,7 @@ const mockProduct: Product = {
     brand: 'Test Brand',
     movement_type: 'Automático',
     image_path: null,
-    image_url: null,
+    image_url: 'https://img.chrono24.com/images/uhren/39539607-m9too3m1kpkrqpnnxklsvnxp-Zoom.jpg',
     is_active: true,
     category: null,
     created_at: '2024-01-01T00:00:00Z',
