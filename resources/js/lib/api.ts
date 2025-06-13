@@ -134,17 +134,13 @@ export class CartApi {
 }
 
 export class UserOrderApi {
-    private static baseUrl = '/api/v1/user/orders';
+    private static baseUrl = '/ajax/user/orders';
 
     private static getHeaders(): Record<string, string> {
-        const token = document.querySelector('meta[name="auth-token"]')?.getAttribute('content') ||
-                     localStorage.getItem('auth_token');
-
         return {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-            ...(token && { 'Authorization': `Bearer ${token}` }),
         };
     }
 
