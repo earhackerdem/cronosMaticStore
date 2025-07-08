@@ -48,3 +48,7 @@ coverage.xml
 /resources/js/ziggy.js
 /resources/js/ziggy.d.ts
 cookies.txt
+
+# Docker
+docker.env
+.env.docker
