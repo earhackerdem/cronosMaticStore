@@ -49,9 +49,19 @@ Este proyecto utiliza Docker para proporcionar un entorno de desarrollo completo
 ./docker-setup.sh dev
 ```
 
+### Iniciar el entorno de desarrollo completo (con phpMyAdmin)
+```bash
+docker compose up -d dev phpmyadmin
+```
+
 ### Iniciar el entorno de producción
 ```bash
 ./docker-setup.sh prod
+```
+
+### Iniciar solo phpMyAdmin
+```bash
+docker compose up -d phpmyadmin
 ```
 
 ### Detener todos los servicios
