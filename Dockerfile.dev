@@ -1,0 +1,68 @@
+# Dockerfile para desarrollo de CronosMaticStore
+FROM php:8.2-fpm
+
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    nodejs \
+    npm \
+    supervisor \
+    nginx \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && echo 'no' | pecl install redis \
+    && docker-php-ext-enable redis \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Instalar Node.js 18
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
+# Crear directorio de trabajo
+WORKDIR /var/www/html
+
+# Copiar archivos de dependencias
+COPY composer.json composer.lock ./
+COPY package.json package-lock.json ./
+
+# Instalar dependencias de PHP (incluyendo dev, sin scripts post-install)
+RUN composer install --optimize-autoloader --no-interaction --no-scripts
+
+# Instalar dependencias de Node.js (incluyendo dev)
+RUN npm install
+
+# Copiar el código de la aplicación
+COPY . .
+
+# Ejecutar scripts post-install después de copiar el código
+RUN composer run-script post-autoload-dump
+
+# Configurar permisos
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
+
+# Configurar PHP para desarrollo
+COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
+
+# Configurar Nginx
+COPY docker/nginx.conf /etc/nginx/sites-available/default
+
+# Configurar Supervisor para desarrollo
+COPY docker/supervisord.dev.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Exponer puertos
+EXPOSE 80 3000 5173
+
+# Comando de inicio para desarrollo
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
