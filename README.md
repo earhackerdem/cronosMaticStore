@@ -147,3 +147,27 @@ Se ejecuta en push/PR a `develop` y `main`:
 - **PHP**: Laravel Pint para formateo automático
 - **Frontend**: ESLint + Prettier para código TypeScript/React
 - **Auto-format**: Formatea código automáticamente
+
+## 🐳 Testing en Docker
+
+El proyecto incluye soporte completo para ejecutar tests en el entorno Docker:
+
+```bash
+# Ejecutar todos los tests en Docker
+./run-tests-docker.sh all
+
+# Tests específicos
+./run-tests-docker.sh backend   # PHP/Laravel tests
+./run-tests-docker.sh frontend  # React/Vitest tests  
+./run-tests-docker.sh e2e       # Cypress E2E tests
+```
+
+**Documentación completa**: [DOCKER-TESTING.md](./DOCKER-TESTING.md)
+
+### Características del Testing en Docker:
+- ✅ **Configuración automática** de base de datos SQLite para tests
+- ✅ **Gestión de dependencias** automática (PHP + Node.js)
+- ✅ **Servidores temporales** para tests E2E
+- ✅ **Configuraciones optimizadas** para contenedores
+- ✅ **Reportes detallados** con cobertura de código
+- ✅ **Limpieza automática** al finalizar
