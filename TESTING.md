@@ -24,7 +24,7 @@ Esta guía explica cómo ejecutar los diferentes tipos de tests en el proyecto C
 
 ## 🚀 Comandos para Ejecutar Tests
 
-### Ejecutar Tests Individuales
+### Ejecutar Tests Individuales (Local)
 
 ```bash
 # Backend (PHP/Laravel)
@@ -41,14 +41,41 @@ npm run test:frontend
 npm run test:e2e
 ```
 
+### Ejecutar Tests en Docker 🐳
+
+```bash
+# Backend en Docker
+./run-tests-docker.sh backend
+# o
+npm run test:docker:backend
+
+# Frontend en Docker
+./run-tests-docker.sh frontend
+# o
+npm run test:docker:frontend
+
+# E2E en Docker
+./run-tests-docker.sh e2e
+# o
+npm run test:docker:e2e
+
+# Todos los tests en Docker
+./run-tests-docker.sh all
+# o
+npm run test:docker:all
+```
+
 ### Ejecutar Todos los Tests
 
 ```bash
-# Opción 1: Comando npm secuencial
+# Local - Opción 1: Comando npm secuencial
 npm run test:all
 
-# Opción 2: Script shell con mejor formato
+# Local - Opción 2: Script shell con mejor formato
 ./run-all-tests.sh
+
+# Docker - Todos los tests
+./run-tests-docker.sh all
 ```
 
 ## 📋 Comandos Adicionales
@@ -102,9 +129,26 @@ Cuando todos los tests pasan exitosamente, deberías ver:
 - Base URL: `http://localhost:8000`
 - Soporte: `cypress/support/`
 
+## 🐳 Testing en Docker
+
+### Configuración Específica para Docker
+- **PHPUnit**: Usa `phpunit.docker.xml` con configuraciones optimizadas
+- **Vitest**: Usa `vitest.docker.config.ts` con timeouts aumentados
+- **Cypress**: Usa `cypress.docker.config.ts` con configuraciones para contenedores
+
+### Base de Datos de Test en Docker
+- **SQLite**: Se usa SQLite en memoria para tests rápidos
+- **Archivo**: `database/testing.sqlite` se crea automáticamente
+- **Configuración**: Variables de entorno específicas en `.env.testing`
+
+### Puertos en Docker
+- **Laravel**: http://localhost:3000 (para E2E tests)
+- **Vite**: http://localhost:5173 (hot reload)
+- **Base de datos**: Puerto 3306 (MariaDB)
+
 ## 🔧 Troubleshooting
 
-### Tests de Backend Fallan
+### Tests de Backend Fallan (Local)
 ```bash
 # Limpiar caché y configuración
 php artisan config:clear
@@ -112,18 +156,51 @@ php artisan cache:clear
 php artisan test
 ```
 
-### Tests E2E Fallan
+### Tests de Backend Fallan (Docker)
+```bash
+# Acceder al contenedor y limpiar
+docker compose exec dev bash
+php artisan config:clear
+php artisan cache:clear
+php artisan test --configuration=phpunit.docker.xml
+```
+
+### Tests E2E Fallan (Local)
 ```bash
 # Asegúrate de que el servidor esté corriendo
 php artisan serve  # Puerto 8000
 npm run dev        # Puerto 5173
 ```
 
-### Tests de Frontend Fallan
+### Tests E2E Fallan (Docker)
+```bash
+# Verificar que los contenedores estén corriendo
+docker compose ps
+# Si no están corriendo, iniciarlos
+docker compose up -d dev db redis
+```
+
+### Tests de Frontend Fallan (Local)
 ```bash
 # Reinstalar dependencias
 npm ci
 npm run test:run
+```
+
+### Tests de Frontend Fallan (Docker)
+```bash
+# Acceder al contenedor y reinstalar
+docker compose exec dev bash
+npm ci
+npx vitest run --config vitest.docker.config.ts
+```
+
+### Problemas de Permisos en Docker
+```bash
+# Arreglar permisos de archivos de test
+docker compose exec dev bash
+chown -R www-data:www-data /var/www/html/database/testing.sqlite
+chmod 666 /var/www/html/database/testing.sqlite
 ```
 
 ## 📝 Notas Importantes
