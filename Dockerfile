@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     nginx \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && echo 'no' | pecl install redis \
+    && docker-php-ext-enable redis \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -54,7 +56,7 @@ RUN chown -R www-data:www-data /var/www/html \
 RUN npm run build
 
 # Configurar PHP
-COPY docker/php.ini /usr/local/etc/php/conf.d/custom.ini
+COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
 
 # Configurar Nginx
 COPY docker/nginx.conf /etc/nginx/sites-available/default

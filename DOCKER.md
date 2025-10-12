@@ -27,10 +27,10 @@ Este proyecto utiliza Docker para proporcionar un entorno de desarrollo completo
 ### Base de Datos (`db`)
 - **Tipo**: MariaDB 10.11
 - **Puerto**: 3306
-- **Credenciales**: 
+- **Credenciales**:
   - Usuario: `cronosmatic`
-  - Contraseña: `cronosmatic123`
-  - Base de datos: `cronosmatic_store`
+  - Contraseña: `cronosmatic_password`
+  - Base de datos: `cronosmatic`
 
 ### Redis (`redis`)
 - **Puerto**: 6379
@@ -38,9 +38,9 @@ Este proyecto utiliza Docker para proporcionar un entorno de desarrollo completo
 
 ### phpMyAdmin (`phpmyadmin`)
 - **URL**: http://localhost:8080
-- **Credenciales**: 
+- **Credenciales**:
   - Usuario: `cronosmatic`
-  - Contraseña: `cronosmatic123`
+  - Contraseña: `cronosmatic_password`
 
 ## Comandos Principales
 
