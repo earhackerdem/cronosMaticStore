@@ -60,9 +60,9 @@ esac
 
 # Crear archivo .env si no existe
 if [ ! -f .env ]; then
-    echo "📝 Creando archivo .env..."
-    cp .env.example .env
-    echo "✅ Archivo .env creado. Por favor, edita las variables según tus necesidades."
+    echo "📝 Creando archivo .env para Docker..."
+    cp .env.docker .env
+    echo "✅ Archivo .env creado desde .env.docker para Docker."
 else
     echo "ℹ️  El archivo .env ya existe."
 fi

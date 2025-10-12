@@ -109,7 +109,7 @@ docker compose exec dev npm test
 ## Configuración de Archivos
 
 ### Variables de Entorno
-El archivo `docker.env` contiene todas las variables necesarias para el entorno Docker.
+El archivo `.env.docker` contiene todas las variables necesarias para el entorno Docker. Este archivo se utiliza automáticamente al ejecutar `./docker-setup.sh`.
 
 ### Configuración PHP
 - **Archivo**: `docker/php/custom.ini`
