@@ -138,6 +138,25 @@ test-parallel: ## Ejecutar tests en paralelo
 	@echo "$(BLUE)Ejecutando tests en paralelo...$(NC)"
 	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) php artisan test --parallel
 
+test-e2e: ## Ejecutar tests E2E (Cypress)
+	@echo "$(BLUE)Ejecutando tests E2E con Cypress...$(NC)"
+	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npm run test:e2e
+
+test-e2e-open: ## Abrir Cypress en modo interactivo
+	@echo "$(BLUE)Abriendo Cypress UI...$(NC)"
+	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npm run test:e2e:open
+
+test-e2e-docker: ## Ejecutar tests E2E con configuración Docker
+	@echo "$(BLUE)Ejecutando tests E2E con cypress.docker.config.ts...$(NC)"
+	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npx cypress run --config-file cypress.docker.config.ts
+
+test-all: ## Ejecutar TODOS los tests (backend + frontend + e2e)
+	@echo "$(BLUE)Ejecutando suite completa de tests...$(NC)"
+	@make test-backend
+	@make test-frontend
+	@make test-e2e
+	@echo "$(GREEN)✓ Suite completa de tests ejecutada$(NC)"
+
 ##@ Dependencias
 
 composer-install: ## Instalar dependencias PHP
