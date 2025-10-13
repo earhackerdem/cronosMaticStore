@@ -51,4 +51,3 @@ cookies.txt
 
 # Docker
 docker.env
-.env.docker

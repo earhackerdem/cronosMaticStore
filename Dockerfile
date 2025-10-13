@@ -11,8 +11,6 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    nodejs \
-    npm \
     supervisor \
     nginx \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
@@ -24,7 +22,7 @@ RUN apt-get update && apt-get install -y \
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Instalar Node.js 18 (más reciente y estable)
+# Instalar Node.js 18 (versión específica desde NodeSource)
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs
 
