@@ -138,17 +138,17 @@ test-parallel: ## Ejecutar tests en paralelo
 	@echo "$(BLUE)Ejecutando tests en paralelo...$(NC)"
 	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) php artisan test --parallel
 
-test-e2e: ## Ejecutar tests E2E (Cypress)
+test-e2e: ## Ejecutar tests E2E (Cypress) con configuración Docker
 	@echo "$(BLUE)Ejecutando tests E2E con Cypress...$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npm run test:e2e
+	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npx cypress run --config-file cypress.docker.config.ts
 
 test-e2e-open: ## Abrir Cypress en modo interactivo
 	@echo "$(BLUE)Abriendo Cypress UI...$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npm run test:e2e:open
+	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npx cypress open --config-file cypress.docker.config.ts
 
-test-e2e-docker: ## Ejecutar tests E2E con configuración Docker
-	@echo "$(BLUE)Ejecutando tests E2E con cypress.docker.config.ts...$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npx cypress run --config-file cypress.docker.config.ts
+test-e2e-headless: ## Ejecutar tests E2E sin configuración especial (para CI)
+	@echo "$(BLUE)Ejecutando tests E2E modo headless...$(NC)"
+	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npm run test:e2e
 
 test-all: ## Ejecutar TODOS los tests (backend + frontend + e2e)
 	@echo "$(BLUE)Ejecutando suite completa de tests...$(NC)"

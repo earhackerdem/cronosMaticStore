@@ -33,6 +33,7 @@ storage/*.key
 coverage
 .nyc_output
 .phpunit.result.cache
+storage/framework/testing/
 
 # Archivos de IDE
 .vscode
