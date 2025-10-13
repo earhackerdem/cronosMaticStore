@@ -61,8 +61,17 @@ esac
 # Crear archivo .env si no existe
 if [ ! -f .env ]; then
     echo "📝 Creando archivo .env para Docker..."
-    cp .env.docker .env
-    echo "✅ Archivo .env creado desde .env.docker para Docker."
+    if [ -f .env.docker ]; then
+        cp .env.docker .env
+        echo "✅ Archivo .env creado desde .env.docker."
+    elif [ -f .env.docker.example ]; then
+        cp .env.docker.example .env
+        echo "✅ Archivo .env creado desde .env.docker.example."
+        echo "⚠️  IMPORTANTE: Debes configurar APP_KEY y credenciales de PayPal en .env"
+    else
+        cp .env.example .env
+        echo "✅ Archivo .env creado desde .env.example."
+    fi
 else
     echo "ℹ️  El archivo .env ya existe."
 fi
