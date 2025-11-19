@@ -52,3 +52,10 @@ cookies.txt
 # Docker
 docker.env
 .env.docker
+
+# Editor
+.claude/
+
+# Test Results
+/tests/results/
+cronosmatic

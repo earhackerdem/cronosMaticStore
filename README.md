@@ -93,11 +93,117 @@ composer run dev
 
 Esto iniciará concurrentemente el servidor Laravel, la cola de trabajos, los logs y Vite en modo desarrollo.
 
+## 🐳 Instalación y Uso con Docker
+
+Docker proporciona un entorno de desarrollo consistente y aislado. Este proyecto incluye soporte completo para Docker con comandos Make simplificados.
+
+### Requisitos para Docker
+- Docker
+- Docker Compose (incluido con Docker Desktop)
+
+### Setup Inicial con Docker
+
+#### Opción 1: Setup Rápido con Script
+```bash
+# Entorno de desarrollo (recomendado)
+./docker-setup.sh dev
+
+# Entorno de desarrollo con phpMyAdmin
+./docker-setup.sh dev-full
+
+# Entorno de producción
+./docker-setup.sh prod
+```
+
+#### Opción 2: Setup con Make (Recomendado)
+```bash
+# Setup completo desde cero
+make fresh
+
+# O inicio rápido si ya está configurado
+make quick-start
+```
+
+### Comandos Docker Esenciales
+
+#### Gestión de Servicios
+```bash
+make up          # Levantar servicios
+make down        # Detener servicios
+make restart     # Reiniciar servicios
+make rebuild     # Reconstruir imágenes
+make status      # Ver estado de servicios
+make info        # Ver información y URLs
+```
+
+#### Acceso a Contenedores
+```bash
+make shell       # Acceder al contenedor dev
+make shell-db    # Acceder a MariaDB
+make shell-redis # Acceder a Redis CLI
+make logs-dev    # Ver logs del contenedor dev
+```
+
+#### URLs Disponibles (Desarrollo)
+- **Aplicación**: http://localhost:3000
+- **Vite (Hot Reload)**: http://localhost:5173
+- **phpMyAdmin**: http://localhost:8080
+  - Usuario: `cronosmatic`
+  - Contraseña: `cronosmatic_password`
+
+### Comandos Laravel en Docker
+```bash
+make migrate            # Ejecutar migraciones
+make migrate-fresh      # Resetear DB con seed
+make seed              # Ejecutar seeders
+make cache-clear       # Limpiar cachés
+make optimize          # Optimizar Laravel
+make artisan CMD="..." # Ejecutar comando artisan
+```
+
+### Gestión de Dependencias
+```bash
+make composer-install  # Instalar dependencias PHP
+make composer-update   # Actualizar dependencias PHP
+make npm-install       # Instalar dependencias Node
+make npm-update        # Actualizar dependencias Node
+make install           # Instalar todas las dependencias
+```
+
+### Assets y Build
+```bash
+make build        # Compilar assets de producción
+make dev-assets   # Iniciar Vite dev server
+make watch        # Alias para dev-assets
+```
+
+### Code Quality
+```bash
+make lint         # Ejecutar ESLint
+make format       # Formatear código con Prettier
+make format-check # Verificar formato
+make pint         # Ejecutar Laravel Pint (PHP)
+make types        # Verificar tipos TypeScript
+make quality      # Ejecutar todas las verificaciones
+```
+
+### Base de Datos
+```bash
+make db-reset                    # Resetear base de datos
+make db-backup                   # Crear backup
+make db-restore FILE=backup.sql  # Restaurar backup
+```
+
+### Ver todos los comandos disponibles
+```bash
+make help  # Lista completa de comandos Make
+```
+
 ## Testing
 
-Este proyecto incluye una suite completa de testing:
+Este proyecto incluye una suite completa de testing con 138 tests distribuidos entre backend, frontend y E2E.
 
-### Comandos de Testing Disponibles
+### Comandos de Testing (Local)
 ```bash
 # Tests unitarios y de integración
 npm run test                    # Ejecutar tests en modo watch
@@ -112,6 +218,36 @@ npm run test:e2e:open         # Alias para cypress:open
 
 # Laravel Tests
 ./vendor/bin/phpunit           # Tests backend PHP
+npm run test:backend           # Alias para PHPUnit
+```
+
+### Comandos de Testing con Docker/Make
+```bash
+# Tests individuales
+make test-backend    # Tests PHP/Laravel (93 tests)
+make test-frontend   # Tests React/Vitest (34 tests)
+make test-e2e        # Tests E2E Cypress (11 tests)
+
+# Tests E2E adicionales
+make test-e2e-open       # Cypress modo interactivo
+make test-e2e-headless   # Cypress para CI
+
+# Ejecutar todos los tests
+make test-all        # Backend + Frontend + E2E (138 tests)
+
+# Tests avanzados
+make test-filter FILTER="ProductTest"  # Filtrar tests
+make test-coverage                     # Con cobertura
+make test-parallel                     # Ejecutar en paralelo
+```
+
+### Resultado Esperado
+Cuando todos los tests pasan exitosamente:
+```
+✅ Backend Tests (93 tests) - PASÓ
+✅ Frontend Tests (34 tests) - PASÓ
+✅ E2E Tests (11 tests) - PASÓ
+🎉 Total: 138 tests
 ```
 
 ### Estructura de Testing
@@ -124,6 +260,15 @@ npm run test:e2e:open         # Alias para cypress:open
 - Umbral mínimo: 70% de cobertura
 - Reportes HTML generados en: `coverage/index.html`
 - Componentes principales cubiertos: LoadingSpinner, Button, ProductsIndex
+
+### Configuración Cypress para Docker
+Los tests E2E utilizan diferentes configuraciones según el entorno:
+- **Docker**: `cypress.docker.config.ts` - Puerto 3000 (comando `make test-e2e`)
+- **Local**: `cypress.config.ts` - Puerto 8000 (comando `npm run test:e2e`)
+
+> ⚠️ **Importante**: Si usas Docker, siempre ejecuta tests E2E con `make test-e2e`, NO con `npm run test:e2e`
+
+Para más detalles sobre testing, consulta [TESTING.md](TESTING.md)
 
 ## Workflows de GitHub Actions
 

@@ -116,15 +116,15 @@ optimize: ## Optimizar Laravel
 
 test: ## Ejecutar todos los tests
 	@echo "$(BLUE)Ejecutando todos los tests...$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) php artisan test
+	$(DOCKER_COMPOSE) exec -e APP_ENV=testing $(DEV_SERVICE) php artisan test
 
 test-backend: ## Ejecutar solo tests de backend (PHP/Laravel)
 	@echo "$(BLUE)Ejecutando tests de backend...$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) php artisan test
+	$(DOCKER_COMPOSE) exec -e APP_ENV=testing $(DEV_SERVICE) php artisan test
 
 test-filter: ## Ejecutar tests filtrados (uso: make test-filter FILTER="ProfileTest")
 	@echo "$(BLUE)Ejecutando tests filtrados: $(FILTER)$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) php artisan test --filter=$(FILTER)
+	$(DOCKER_COMPOSE) exec -e APP_ENV=testing $(DEV_SERVICE) php artisan test --filter=$(FILTER)
 
 test-frontend: ## Ejecutar tests de frontend (Vitest)
 	@echo "$(BLUE)Ejecutando tests de frontend...$(NC)"
@@ -132,11 +132,11 @@ test-frontend: ## Ejecutar tests de frontend (Vitest)
 
 test-coverage: ## Ejecutar tests con reporte de cobertura
 	@echo "$(BLUE)Ejecutando tests con cobertura...$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) php artisan test --coverage
+	$(DOCKER_COMPOSE) exec -e APP_ENV=testing $(DEV_SERVICE) php artisan test --coverage
 
 test-parallel: ## Ejecutar tests en paralelo
 	@echo "$(BLUE)Ejecutando tests en paralelo...$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) php artisan test --parallel
+	$(DOCKER_COMPOSE) exec -e APP_ENV=testing $(DEV_SERVICE) php artisan test --parallel
 
 test-e2e: ## Ejecutar tests E2E (Cypress) con configuración Docker
 	@echo "$(BLUE)Ejecutando tests E2E con Cypress...$(NC)"

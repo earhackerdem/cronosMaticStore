@@ -51,6 +51,75 @@ npm run test:all
 ./run-all-tests.sh
 ```
 
+## 🐳 Tests en Docker con Make
+
+Si estás usando Docker, puedes ejecutar todos los tests usando comandos Make simplificados:
+
+### Comandos Básicos
+
+```bash
+# Backend (PHP/Laravel)
+make test
+# o
+make test-backend
+
+# Frontend (React/Vitest)
+make test-frontend
+
+# E2E (Cypress) - Usa configuración Docker con puerto 3000
+make test-e2e
+
+# E2E modo headless (para CI) - Usa configuración default
+make test-e2e-headless
+
+# E2E modo interactivo
+make test-e2e-open
+
+# Ejecutar TODOS los tests (backend + frontend + e2e)
+make test-all
+```
+
+### Comandos Avanzados
+
+```bash
+# Tests con filtro específico
+make test-filter FILTER="ProductTest"
+
+# Tests con cobertura
+make test-coverage
+
+# Tests en paralelo (más rápido)
+make test-parallel
+```
+
+### Configuración Docker para E2E
+
+El entorno Docker usa una configuración especial para Cypress:
+- **Archivo**: `cypress.docker.config.ts`
+- **Base URL**: `http://localhost:3000` (contenedor dev)
+- **Timeouts**: Aumentados a 15000ms para Docker
+- **Reintentos**: 2 intentos automáticos en modo run
+- **Chrome Flags**: `--no-sandbox`, `--disable-dev-shm-usage`, `--disable-gpu`
+
+### Otros Comandos Make Útiles
+
+```bash
+# Limpiar cachés de Laravel
+make cache-clear
+
+# Ver logs del contenedor
+make logs-dev
+
+# Acceder al shell del contenedor
+make shell
+
+# Ver estado de servicios
+make status
+
+# Información del entorno
+make info
+```
+
 ## 📋 Comandos Adicionales
 
 ### Tests Frontend con Watch Mode
@@ -98,13 +167,17 @@ Cuando todos los tests pasan exitosamente, deberías ver:
 - Mocks: Incluye mocks para Inertia.js y componentes UI
 
 ### E2E (Cypress)
-- Configuración: `cypress.config.ts`
-- Base URL: `http://localhost:8000`
+- Configuración local: `cypress.config.ts` (puerto 8000)
+- Configuración Docker: `cypress.docker.config.ts` (puerto 3000)
+- Base URL local: `http://localhost:8000`
+- Base URL Docker: `http://localhost:3000`
 - Soporte: `cypress/support/`
 
 ## 🔧 Troubleshooting
 
 ### Tests de Backend Fallan
+
+**Local:**
 ```bash
 # Limpiar caché y configuración
 php artisan config:clear
@@ -112,26 +185,84 @@ php artisan cache:clear
 php artisan test
 ```
 
+**Docker:**
+```bash
+# Limpiar caché
+make cache-clear
+
+# Ejecutar tests
+make test-backend
+
+# Ver logs si hay errores
+make logs-dev
+```
+
 ### Tests E2E Fallan
+
+**Local:**
 ```bash
 # Asegúrate de que el servidor esté corriendo
 php artisan serve  # Puerto 8000
 npm run dev        # Puerto 5173
 ```
 
+**Docker:**
+```bash
+# Verificar que los servicios estén corriendo
+make status
+
+# Verificar logs
+make logs-dev
+
+# Reiniciar servicios si es necesario
+make restart
+
+# Verificar URLs disponibles
+make info
+```
+
 ### Tests de Frontend Fallan
+
+**Local:**
 ```bash
 # Reinstalar dependencias
 npm ci
 npm run test:run
 ```
 
+**Docker:**
+```bash
+# Reinstalar dependencias
+make npm-install
+
+# Ejecutar tests
+make test-frontend
+```
+
+### Cypress no puede conectar al servidor (Docker)
+
+Si ves el error "Cypress failed to verify that your server is running":
+
+```bash
+# Verificar que estés usando la configuración correcta
+make test-e2e  # Usa cypress.docker.config.ts (puerto 3000) ✅
+
+# NO uses:
+npm run test:e2e  # Usa cypress.config.ts (puerto 8000) ❌
+```
+
 ## 📝 Notas Importantes
 
 1. **Prerequisitos**: Asegúrate de que los servidores estén corriendo para los tests E2E
+   - **Local**: `php artisan serve` (puerto 8000) + `npm run dev` (puerto 5173)
+   - **Docker**: `make up` o `docker compose up -d`
 2. **Orden de Ejecución**: Backend → Frontend → E2E (para máxima confiabilidad)
 3. **CI/CD**: Todos los tests deben pasar antes de hacer merge a main
 4. **Cobertura**: Se recomienda mantener > 80% de cobertura en componentes críticos
+5. **Docker**: Usa comandos `make` para ejecutar tests en Docker, no comandos `npm` directamente
+6. **Configuración Cypress**:
+   - Usa `cypress.docker.config.ts` en Docker (puerto 3000)
+   - Usa `cypress.config.ts` en local (puerto 8000)
 
 ## 🎯 Tests por Funcionalidad
 

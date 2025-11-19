@@ -84,6 +84,11 @@ class ProductController extends Controller
             ->with('category')
             ->firstOrFail();
 
+        // Enforce case sensitivity for slug
+        if ($product->slug !== $slug) {
+            abort(404);
+        }
+
         return Inertia::render('Products/Show', [
             'product' => $product,
         ]);
