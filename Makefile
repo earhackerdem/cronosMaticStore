@@ -220,12 +220,12 @@ db-reset: migrate-fresh ## Resetear base de datos (alias)
 db-backup: ## Crear backup de la base de datos
 	@echo "$(BLUE)Creando backup de la base de datos...$(NC)"
 	@mkdir -p backups
-	$(DOCKER_COMPOSE) exec $(DB_SERVICE) mysqldump -u cronosmatic -pcronosmatic_password cronosmatic > backups/db_backup_$$(date +%Y%m%d_%H%M%S).sql
+	$(DOCKER_COMPOSE) exec -T $(DB_SERVICE) sh -c 'mysqldump -u "$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE"' > backups/db_backup_$$(date +%Y%m%d_%H%M%S).sql
 	@echo "$(GREEN)✓ Backup creado en backups/$(NC)"
 
 db-restore: ## Restaurar backup (uso: make db-restore FILE=backups/db_backup_xxx.sql)
 	@echo "$(BLUE)Restaurando backup...$(NC)"
-	$(DOCKER_COMPOSE) exec -T $(DB_SERVICE) mysql -u cronosmatic -pcronosmatic_password cronosmatic < $(FILE)
+	$(DOCKER_COMPOSE) exec -T $(DB_SERVICE) sh -c 'mysql -u "$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE"' < $(FILE)
 	@echo "$(GREEN)✓ Backup restaurado$(NC)"
 
 ##@ Mantenimiento
