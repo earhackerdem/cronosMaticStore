@@ -1,127 +1,47 @@
+# CronosMatic Store
+
+Proyecto de comercio electrónico moderno construido con Laravel y React.
+
 ## Requisitos previos
-- PHP 8.2 o superior
-- Composer
-- Node.js (versión reciente)
-- npm
+- Docker & Docker Compose (Recomendado)
+- Opcional (para instalación local): PHP 8.2+, Composer, Node.js
 
-## Pasos para la instalación
-
-### 1. Clonar el repositorio
-```
-git clone https://github.com/earhackerdem/cronosMaticStore
-cd cronosMaticStore
-```
-
-### 2. Instalar dependencias de PHP
-```
-composer install
-```
-
-### 3. Instalar dependencias de JavaScript
-```
-npm install
-```
-
-### 4. Configurar el entorno
-```
-cp .env.example .env
-```
-
-### 5. Configurar SQLite
-Edita el archivo `.env` para usar SQLite:
-```
-DB_CONNECTION=sqlite
-DB_DATABASE=database/database.sqlite
-```
-
-### 6. Crear el archivo de base de datos SQLite
-```
-touch database/database.sqlite
-```
-
-### 7. Generar la clave de la aplicación
-```
-php artisan key:generate
-```
-
-### 8. Ejecutar las migraciones
-```
-php artisan migrate
-```
-
-### 9. Configurar base de datos de pruebas
-Para ejecutar las pruebas, se utiliza una base de datos SQLite separada. El archivo de la base de datos de pruebas se creará automáticamente al ejecutar los tests o puede crearlo manualmente:
-```
-touch database/testing.sqlite
-```
-Asegúrate de que tu archivo `.env.testing` (si lo tienes) o tu configuración de `phpunit.xml` apunten a `database/testing.sqlite`.
-
-### 10. Opcional: Cargar datos de prueba
-```
-php artisan db:seed
-```
-
-### 11. Compilar assets
-```
-npm run build
-```
-
-### 12. Iniciar el servidor
-```
-php artisan serve
-```
-
-Ahora puedes acceder a la aplicación en http://localhost:8000
-
-## Desarrollo
-
-Para trabajar en modo desarrollo con hot reload:
-```
-npm run dev
-```
-
-En otra terminal, inicia el servidor de Laravel:
-```
-php artisan serve
-```
-
-## Comando todo en uno para desarrollo
-También puedes usar el comando definido en composer.json:
-```
-composer run dev
-```
-
-Esto iniciará concurrentemente el servidor Laravel, la cola de trabajos, los logs y Vite en modo desarrollo.
-
-## 🐳 Instalación y Uso con Docker
+## 🐳 Instalación y Uso con Docker (Recomendado)
 
 Docker proporciona un entorno de desarrollo consistente y aislado. Este proyecto incluye soporte completo para Docker con comandos Make simplificados.
 
-### Requisitos para Docker
-- Docker
-- Docker Compose (incluido con Docker Desktop)
+### Setup Inicial
 
-### Setup Inicial con Docker
-
-#### Opción 1: Setup Rápido con Script
+#### Opción 1: Setup con Make (Recomendado)
 ```bash
-# Entorno de desarrollo (recomendado)
-./docker-setup.sh dev
-
-# Entorno de desarrollo con phpMyAdmin
-./docker-setup.sh dev-full
-
-# Entorno de producción
-./docker-setup.sh prod
-```
-
-#### Opción 2: Setup con Make (Recomendado)
-```bash
-# Setup completo desde cero
+# Setup completo desde cero (construye contenedores, instala dependencias, migra DB)
 make fresh
 
 # O inicio rápido si ya está configurado
 make quick-start
+```
+
+#### Opción 2: Setup Rápido con Script
+```bash
+# Entorno de desarrollo
+./docker-setup.sh dev
+```
+
+### ✅ Verificación de la Instalación
+
+Una vez que el entorno esté levantado, ejecuta los tests para verificar que todo funciona correctamente:
+
+```bash
+# Ejecutar suite completa de tests (Backend + Frontend + E2E)
+make test-all
+```
+
+Si ves algo como esto, ¡tu entorno está listo! 🎉
+```
+✅ Backend Tests (93 tests) - PASÓ
+✅ Frontend Tests (34 tests) - PASÓ
+✅ E2E Tests (11 tests) - PASÓ
+🎉 Total: 138 tests
 ```
 
 ### Comandos Docker Esenciales
@@ -199,27 +119,57 @@ make db-restore FILE=backup.sql  # Restaurar backup
 make help  # Lista completa de comandos Make
 ```
 
+## 🛠️ Instalación Local (Manual)
+
+Si prefieres no usar Docker, sigue estos pasos:
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/earhackerdem/cronosMaticStore
+cd cronosMaticStore
+```
+
+### 2. Instalar dependencias
+```bash
+composer install
+npm install
+```
+
+### 3. Configurar el entorno
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+### 4. Configurar Base de Datos
+Edita el archivo `.env` para usar SQLite (o tu base de datos preferida):
+```
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+```
+Crea el archivo:
+```bash
+touch database/database.sqlite
+```
+
+### 5. Migraciones y Seeds
+```bash
+php artisan migrate --seed
+```
+
+### 6. Iniciar
+```bash
+npm run build
+php artisan serve
+```
+En otra terminal:
+```bash
+npm run dev
+```
+
 ## Testing
 
 Este proyecto incluye una suite completa de testing con 138 tests distribuidos entre backend, frontend y E2E.
-
-### Comandos de Testing (Local)
-```bash
-# Tests unitarios y de integración
-npm run test                    # Ejecutar tests en modo watch
-npm run test:run               # Ejecutar tests una vez
-npm run test:coverage          # Generar reporte de cobertura
-
-# Tests E2E con Cypress
-npm run cypress:open           # Abrir Cypress UI
-npm run cypress:run            # Ejecutar tests E2E headless
-npm run test:e2e              # Alias para cypress:run
-npm run test:e2e:open         # Alias para cypress:open
-
-# Laravel Tests
-./vendor/bin/phpunit           # Tests backend PHP
-npm run test:backend           # Alias para PHPUnit
-```
 
 ### Comandos de Testing con Docker/Make
 ```bash
@@ -241,13 +191,22 @@ make test-coverage                     # Con cobertura
 make test-parallel                     # Ejecutar en paralelo
 ```
 
-### Resultado Esperado
-Cuando todos los tests pasan exitosamente:
-```
-✅ Backend Tests (93 tests) - PASÓ
-✅ Frontend Tests (34 tests) - PASÓ
-✅ E2E Tests (11 tests) - PASÓ
-🎉 Total: 138 tests
+### Comandos de Testing (Local)
+```bash
+# Tests unitarios y de integración
+npm run test                    # Ejecutar tests en modo watch
+npm run test:run               # Ejecutar tests una vez
+npm run test:coverage          # Generar reporte de cobertura
+
+# Tests E2E con Cypress
+npm run cypress:open           # Abrir Cypress UI
+npm run cypress:run            # Ejecutar tests E2E headless
+npm run test:e2e              # Alias para cypress:run
+npm run test:e2e:open         # Alias para cypress:open
+
+# Laravel Tests
+./vendor/bin/phpunit           # Tests backend PHP
+npm run test:backend           # Alias para PHPUnit
 ```
 
 ### Estructura de Testing
@@ -255,11 +214,6 @@ Cuando todos los tests pasan exitosamente:
 - **Integration Tests**: `resources/js/__tests__/pages/` - Tests de páginas completas
 - **E2E Tests**: `cypress/e2e/` - Tests end-to-end con Cypress
 - **Backend Tests**: `tests/` - Tests PHPUnit de Laravel
-
-### Cobertura de Testing
-- Umbral mínimo: 70% de cobertura
-- Reportes HTML generados en: `coverage/index.html`
-- Componentes principales cubiertos: LoadingSpinner, Button, ProductsIndex
 
 ### Configuración Cypress para Docker
 Los tests E2E utilizan diferentes configuraciones según el entorno:
