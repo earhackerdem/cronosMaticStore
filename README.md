@@ -3,246 +3,187 @@
 Proyecto de comercio electrónico moderno construido con Laravel y React.
 
 ## Requisitos previos
-- Docker & Docker Compose (Recomendado)
-- Opcional (para instalación local): PHP 8.2+, Composer, Node.js
+- Docker & Docker Compose (recomendado)
+- Opcional (instalación local): PHP 8.2+, Composer, Node.js 22+
 
-## 🐳 Instalación y Uso con Docker (Recomendado)
+## Inicio rápido con Docker
 
-Docker proporciona un entorno de desarrollo consistente y aislado. Este proyecto incluye soporte completo para Docker con comandos Make simplificados.
-
-### Setup Inicial
-
-#### Opción 1: Setup con Make (Recomendado)
-```bash
-# Setup completo desde cero (construye contenedores, instala dependencias, migra DB)
-make fresh
-
-# O inicio rápido si ya está configurado
-make quick-start
-```
-
-#### Opción 2: Setup Rápido con Script
-```bash
-# Entorno de desarrollo
-./docker-setup.sh dev
-```
-
-### ✅ Verificación de la Instalación
-
-Una vez que el entorno esté levantado, ejecuta los tests para verificar que todo funciona correctamente:
-
-```bash
-# Ejecutar suite completa de tests (Backend + Frontend + E2E)
-make test-all
-```
-
-Si ves algo como esto, ¡tu entorno está listo! 🎉
-```
-✅ Backend Tests (93 tests) - PASÓ
-✅ Frontend Tests (34 tests) - PASÓ
-✅ E2E Tests (11 tests) - PASÓ
-🎉 Total: 138 tests
-```
-
-### Comandos Docker Esenciales
-
-#### Gestión de Servicios
-```bash
-make up          # Levantar servicios
-make down        # Detener servicios
-make restart     # Reiniciar servicios
-make rebuild     # Reconstruir imágenes
-make status      # Ver estado de servicios
-make info        # Ver información y URLs
-```
-
-#### Acceso a Contenedores
-```bash
-make shell       # Acceder al contenedor dev
-make shell-db    # Acceder a MariaDB
-make shell-redis # Acceder a Redis CLI
-make logs-dev    # Ver logs del contenedor dev
-```
-
-#### URLs Disponibles (Desarrollo)
-- **Aplicación**: http://localhost:3000
-- **Vite (Hot Reload)**: http://localhost:5173
-- **phpMyAdmin**: http://localhost:8080
-  - Usuario: `cronosmatic`
-  - Contraseña: `cronosmatic_password`
-
-### Comandos Laravel en Docker
-```bash
-make migrate            # Ejecutar migraciones
-make migrate-fresh      # Resetear DB con seed
-make seed              # Ejecutar seeders
-make cache-clear       # Limpiar cachés
-make optimize          # Optimizar Laravel
-make artisan CMD="..." # Ejecutar comando artisan
-```
-
-### Gestión de Dependencias
-```bash
-make composer-install  # Instalar dependencias PHP
-make composer-update   # Actualizar dependencias PHP
-make npm-install       # Instalar dependencias Node
-make npm-update        # Actualizar dependencias Node
-make install           # Instalar todas las dependencias
-```
-
-### Assets y Build
-```bash
-make build        # Compilar assets de producción
-make dev-assets   # Iniciar Vite dev server
-make watch        # Alias para dev-assets
-```
-
-### Code Quality
-```bash
-make lint         # Ejecutar ESLint
-make format       # Formatear código con Prettier
-make format-check # Verificar formato
-make pint         # Ejecutar Laravel Pint (PHP)
-make types        # Verificar tipos TypeScript
-make quality      # Ejecutar todas las verificaciones
-```
-
-### Base de Datos
-```bash
-make db-reset                    # Resetear base de datos
-make db-backup                   # Crear backup
-make db-restore FILE=backup.sql  # Restaurar backup
-```
-
-### Ver todos los comandos disponibles
-```bash
-make help  # Lista completa de comandos Make
-```
-
-## 🛠️ Instalación Local (Manual)
-
-Si prefieres no usar Docker, sigue estos pasos:
-
-### 1. Clonar el repositorio
 ```bash
 git clone https://github.com/earhackerdem/cronosMaticStore
 cd cronosMaticStore
+make setup
 ```
 
-### 2. Instalar dependencias
+`make setup` es el comando de entrada para cualquier entorno nuevo. Es **idempotente** — puedes ejecutarlo varias veces sin romper nada. Hace exactamente esto:
+
+1. Copia `.env.docker.example` → `.env` (si no existe)
+2. Levanta los servicios Docker (`docker compose up -d`)
+3. Instala dependencias PHP y Node
+4. Genera `APP_KEY` si falta
+5. Corre migraciones
+6. Ejecuta seeders si la base de datos está vacía
+7. Crea el symlink de storage
+
+Cuando termina, la app queda disponible en **http://localhost:3000**.
+
+## Cuándo usar cada comando de setup
+
+| Comando | Cuándo usarlo |
+|---|---|
+| `make setup` | Primera vez, o para reparar un entorno sin perder datos |
+| `make fresh` | Reset completo — destruye volúmenes, reconstruye imágenes desde cero |
+| `make quick-start` | El entorno ya está configurado, solo necesitas levantar y migrar |
+
+## Gestión de servicios
+
 ```bash
-composer install
-npm install
+make up          # Levantar todos los servicios
+make down        # Detener servicios
+make restart     # Reiniciar servicios
+make rebuild     # Reconstruir imágenes Docker
+make status      # Ver estado de contenedores
+make info        # Ver URLs y credenciales
+make logs        # Ver logs de todos los servicios
+make logs-dev    # Ver logs del contenedor dev
 ```
 
-### 3. Configurar el entorno
+## URLs disponibles
+
+| Servicio | URL |
+|---|---|
+| Aplicación | http://localhost:3000 |
+| Vite HMR | http://localhost:5173 |
+| phpMyAdmin | http://localhost:8080 |
+| API REST | http://localhost:3000/api/v1/ |
+
+phpMyAdmin: usuario `cronosmatic`, contraseña `cronosmatic_password`.
+
+## Acceso a contenedores
+
 ```bash
-cp .env.example .env
-php artisan key:generate
+make shell       # Bash en el contenedor dev
+make shell-db    # Cliente MariaDB
+make shell-redis # Redis CLI
+make tinker      # Laravel Tinker
 ```
 
-### 4. Configurar Base de Datos
-Edita el archivo `.env` para usar SQLite (o tu base de datos preferida):
-```
-DB_CONNECTION=sqlite
-DB_DATABASE=database/database.sqlite
-```
-Crea el archivo:
+## Base de datos
+
 ```bash
-touch database/database.sqlite
+make migrate            # Ejecutar migraciones pendientes
+make migrate-fresh      # Reset completo con seed (destructivo)
+make seed               # Ejecutar seeders
+make db-reset           # Resetear base de datos
+make db-backup          # Crear backup en database/backups/
+make db-restore FILE=database/backups/backup.sql  # Restaurar backup
 ```
 
-### 5. Migraciones y Seeds
+## Artisan y dependencias
+
 ```bash
-php artisan migrate --seed
+make artisan CMD="route:list"   # Cualquier comando artisan
+make cache-clear                # Limpiar cachés de Laravel
+make optimize                   # Optimizar para producción
+make composer-install           # Instalar dependencias PHP
+make npm-install                # Instalar dependencias Node
+make install                    # Instalar todas las dependencias
 ```
 
-### 6. Iniciar
+## Assets
+
 ```bash
-npm run build
-php artisan serve
+make build       # Compilar assets de producción
+make dev-assets  # Iniciar Vite dev server (alias: make watch)
 ```
-En otra terminal:
+
+## Code quality
+
 ```bash
-npm run dev
+make lint         # ESLint --fix
+make pint         # Laravel Pint (PHP formatter)
+make types        # tsc --noEmit
+make format       # Prettier
+make quality      # lint + types + pint
 ```
 
 ## Testing
 
-Este proyecto incluye una suite completa de testing con 138 tests distribuidos entre backend, frontend y E2E.
+La suite completa tiene **441 tests**: 284 backend, 109 frontend, 48 E2E.
 
-### Comandos de Testing con Docker/Make
 ```bash
-# Tests individuales
-make test-backend    # Tests PHP/Laravel (93 tests)
-make test-frontend   # Tests React/Vitest (34 tests)
-make test-e2e        # Tests E2E Cypress (11 tests)
+make test-all     # Backend + Frontend + E2E (comando de referencia)
 
-# Tests E2E adicionales
-make test-e2e-open       # Cypress modo interactivo
-make test-e2e-headless   # Cypress para CI
+make test-backend                        # PHPUnit (284 tests)
+make test-frontend                       # Vitest (109 tests)
+make test-e2e                            # Cypress headless (48 tests)
+make test-e2e-open                       # Cypress con UI interactiva
 
-# Ejecutar todos los tests
-make test-all        # Backend + Frontend + E2E (138 tests)
-
-# Tests avanzados
-make test-filter FILTER="ProductTest"  # Filtrar tests
-make test-coverage                     # Con cobertura
-make test-parallel                     # Ejecutar en paralelo
+make test-filter FILTER="ProductTest"    # Filtrar tests backend por nombre
+make test-coverage                       # PHPUnit con cobertura
+make test-parallel                       # PHPUnit en paralelo
 ```
 
-### Comandos de Testing (Local)
-```bash
-# Tests unitarios y de integración
-npm run test                    # Ejecutar tests en modo watch
-npm run test:run               # Ejecutar tests una vez
-npm run test:coverage          # Generar reporte de cobertura
+> **Docker vs local para E2E**: `make test-e2e` apunta a `:3000` (dev container).
+> `npm run test:e2e` apunta a `:8000` (servicio app). En Docker usa siempre `make test-e2e`.
 
-# Tests E2E con Cypress
-npm run cypress:open           # Abrir Cypress UI
-npm run cypress:run            # Ejecutar tests E2E headless
-npm run test:e2e              # Alias para cypress:run
-npm run test:e2e:open         # Alias para cypress:open
+### Estructura de tests
 
-# Laravel Tests
-./vendor/bin/phpunit           # Tests backend PHP
-npm run test:backend           # Alias para PHPUnit
+```
+tests/                          # PHPUnit
+  Unit/
+  Feature/Api/V1/
+
+resources/js/__tests__/         # Vitest
+  components/
+  pages/
+
+cypress/e2e/                    # Cypress
+  products.cy.ts
+  cart-functionality.cy.ts
+  address-management.cy.ts
+  checkout/checkout-flow.cy.ts
 ```
 
-### Estructura de Testing
-- **Unit Tests**: `resources/js/__tests__/components/` - Tests de componentes individuales
-- **Integration Tests**: `resources/js/__tests__/pages/` - Tests de páginas completas
-- **E2E Tests**: `cypress/e2e/` - Tests end-to-end con Cypress
-- **Backend Tests**: `tests/` - Tests PHPUnit de Laravel
+### Ver todos los comandos disponibles
 
-### Configuración Cypress para Docker
-Los tests E2E utilizan diferentes configuraciones según el entorno:
-- **Docker**: `cypress.docker.config.ts` - Puerto 3000 (comando `make test-e2e`)
-- **Local**: `cypress.config.ts` - Puerto 8000 (comando `npm run test:e2e`)
+```bash
+make help
+```
 
-> ⚠️ **Importante**: Si usas Docker, siempre ejecuta tests E2E con `make test-e2e`, NO con `npm run test:e2e`
+---
 
-Para más detalles sobre testing, consulta [TESTING.md](TESTING.md)
+## Instalación local (sin Docker)
 
-## Workflows de GitHub Actions
+Si prefieres no usar Docker:
 
-Este proyecto utiliza GitHub Actions para automatizar CI/CD:
+```bash
+git clone https://github.com/earhackerdem/cronosMaticStore
+cd cronosMaticStore
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+```
 
-### Tests Completos (`tests.yml`)
-Se ejecuta en push/PR a `develop` y `main`:
-- **Backend Tests**: PHPUnit + Laravel
-- **Frontend Tests**: Vitest + React Testing Library + cobertura
-- **E2E Tests**: Cypress con servidor Laravel completo
+Edita `.env` para usar SQLite:
+```
+DB_CONNECTION=sqlite
+```
 
-### Tests Frontend Rápidos (`frontend-tests.yml`)
-Se ejecuta solo cuando cambian archivos frontend:
-- **Unit/Integration**: Tests rápidos con Vitest
-- **Component Tests**: Cypress component testing
-- **Coverage**: Reportes de cobertura automáticos en PRs
-- **Type Check**: Validación TypeScript
+```bash
+touch database/database.sqlite
+php artisan migrate --seed
+npm run build
+php artisan serve   # terminal 1
+npm run dev         # terminal 2
+```
 
-### Linter (`lint.yml`)
-Se ejecuta en push/PR a `develop` y `main`:
-- **PHP**: Laravel Pint para formateo automático
-- **Frontend**: ESLint + Prettier para código TypeScript/React
-- **Auto-format**: Formatea código automáticamente
+---
+
+## CI/CD
+
+GitHub Actions corre en push/PR a `develop` y `main`:
+
+- **`tests.yml`** — Backend (PHPUnit + MariaDB service), Frontend (Vitest), E2E (Cypress)
+- **`frontend-tests.yml`** — Solo cuando cambian archivos frontend; incluye type-check y cobertura
+- **`lint.yml`** — ESLint, Prettier y Laravel Pint
