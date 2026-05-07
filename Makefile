@@ -114,17 +114,55 @@ optimize: ## Optimizar Laravel
 
 ##@ Tests
 
+# Variables comunes para apuntar al servicio db_test (MariaDB aislada).
+# Se inyectan al `docker compose exec` para que phpunit/artisan usen esa BD
+# sin tocar la de desarrollo (`cronosmatic`).
+TEST_DB_ENV := -e APP_ENV=testing \
+	-e DB_CONNECTION=mariadb \
+	-e DB_HOST=db_test \
+	-e DB_PORT=3306 \
+	-e DB_DATABASE=cronosmatic_test \
+	-e DB_USERNAME=cronosmatic \
+	-e DB_PASSWORD=cronosmatic_password \
+	-e SESSION_DRIVER=array \
+	-e CACHE_STORE=array \
+	-e QUEUE_CONNECTION=sync \
+	-e MAIL_MAILER=array \
+	-e PAYPAL_SIMULATE_PAYMENTS=true
+
+# Variables para el server HTTP que usa Cypress: la sesión NO puede ser `array`
+# (rompe el login/register entre requests). Usamos `file` con un path aislado
+# para evitar colisiones con Redis/Sessions del server normal de dev.
+TEST_E2E_SERVER_ENV := -e APP_ENV=testing \
+	-e DB_CONNECTION=mariadb \
+	-e DB_HOST=db_test \
+	-e DB_PORT=3306 \
+	-e DB_DATABASE=cronosmatic_test \
+	-e DB_USERNAME=cronosmatic \
+	-e DB_PASSWORD=cronosmatic_password \
+	-e SESSION_DRIVER=file \
+	-e SESSION_FILES=/tmp/cm_test_sessions \
+	-e CACHE_STORE=array \
+	-e QUEUE_CONNECTION=sync \
+	-e MAIL_MAILER=array \
+	-e PAYPAL_SIMULATE_PAYMENTS=true
+
 test: ## Ejecutar todos los tests
 	@echo "$(BLUE)Ejecutando todos los tests...$(NC)"
-	$(DOCKER_COMPOSE) exec -e APP_ENV=testing $(DEV_SERVICE) php artisan test
+	$(DOCKER_COMPOSE) exec $(TEST_DB_ENV) $(DEV_SERVICE) php artisan test
+
+test-db-prepare: ## Preparar BD de testing (cronosmatic_test): migrate:fresh + seed
+	@echo "$(BLUE)Preparando BD de testing (cronosmatic_test)...$(NC)"
+	$(DOCKER_COMPOSE) exec $(TEST_DB_ENV) $(DEV_SERVICE) php artisan migrate:fresh --seed --force
+	@echo "$(GREEN)✓ BD de testing preparada$(NC)"
 
 test-backend: ## Ejecutar solo tests de backend (PHP/Laravel)
 	@echo "$(BLUE)Ejecutando tests de backend...$(NC)"
-	$(DOCKER_COMPOSE) exec -e APP_ENV=testing $(DEV_SERVICE) php artisan test
+	$(DOCKER_COMPOSE) exec $(TEST_DB_ENV) $(DEV_SERVICE) php artisan test
 
 test-filter: ## Ejecutar tests filtrados (uso: make test-filter FILTER="ProfileTest")
 	@echo "$(BLUE)Ejecutando tests filtrados: $(FILTER)$(NC)"
-	$(DOCKER_COMPOSE) exec -e APP_ENV=testing $(DEV_SERVICE) php artisan test --filter=$(FILTER)
+	$(DOCKER_COMPOSE) exec $(TEST_DB_ENV) $(DEV_SERVICE) php artisan test --filter=$(FILTER)
 
 test-frontend: ## Ejecutar tests de frontend (Vitest)
 	@echo "$(BLUE)Ejecutando tests de frontend...$(NC)"
@@ -132,25 +170,69 @@ test-frontend: ## Ejecutar tests de frontend (Vitest)
 
 test-coverage: ## Ejecutar tests con reporte de cobertura
 	@echo "$(BLUE)Ejecutando tests con cobertura...$(NC)"
-	$(DOCKER_COMPOSE) exec -e APP_ENV=testing $(DEV_SERVICE) php artisan test --coverage
+	$(DOCKER_COMPOSE) exec $(TEST_DB_ENV) $(DEV_SERVICE) php artisan test --coverage
 
 test-parallel: ## Ejecutar tests en paralelo
 	@echo "$(BLUE)Ejecutando tests en paralelo...$(NC)"
-	$(DOCKER_COMPOSE) exec -e APP_ENV=testing $(DEV_SERVICE) php artisan test --parallel
+	$(DOCKER_COMPOSE) exec $(TEST_DB_ENV) $(DEV_SERVICE) php artisan test --parallel
 
-test-e2e: ## Ejecutar tests E2E (Cypress) con configuración Docker
-	@echo "$(BLUE)Ejecutando tests E2E con Cypress...$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npx cypress run --config-file cypress.docker.config.ts
+# Para Cypress E2E reconfiguramos el server existente del puerto 3000 para que
+# apunte temporalmente a la BD de testing (cronosmatic_test). Hacemos esto
+# escribiendo un `.env` con valores de testing, reiniciando el server Laravel
+# (matando `php artisan serve` que supervisord levanta de nuevo en segundos),
+# y al terminar restauramos el `.env` original. Esto preserva la integración
+# Vite/Inertia y evita los problemas de un segundo `php artisan serve`.
+#
+# La BD de desarrollo (cronosmatic) NO se modifica en ningún momento — solo
+# cambia a qué BD apunta el server durante el run de Cypress.
 
-test-e2e-open: ## Abrir Cypress en modo interactivo
-	@echo "$(BLUE)Abriendo Cypress UI...$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npx cypress open --config-file cypress.docker.config.ts
+define start_test_server
+	@echo "$(BLUE)Backup del .env del container y aplicación de overrides de testing...$(NC)"
+	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) bash -c "cp -f .env .env.backup-test 2>/dev/null || true"
+	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) bash -c "sed -i -E 's|^DB_HOST=.*|DB_HOST=db_test|; s|^DB_DATABASE=.*|DB_DATABASE=cronosmatic_test|; s|^APP_ENV=.*|APP_ENV=testing|; s|^PAYPAL_SIMULATE_PAYMENTS=.*|PAYPAL_SIMULATE_PAYMENTS=true|; s|^MAIL_MAILER=.*|MAIL_MAILER=array|' .env"
+	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) php artisan config:clear > /dev/null
+	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) php artisan route:clear > /dev/null
+	@echo "$(BLUE)Reiniciando server Laravel (supervisord lo relanza apuntando a BD de testing)...$(NC)"
+	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) bash -c "pkill -HUP -f 'artisan serve' 2>/dev/null; pkill -f 'artisan serve' 2>/dev/null; true" || true
+	@$(DOCKER_COMPOSE) exec -T -d $(DEV_SERVICE) bash -c "php artisan serve --host=0.0.0.0 --port=3000 > /tmp/test-server.log 2>&1"
+	@echo "$(BLUE)Esperando a que el server responda...$(NC)"
+	@$(DOCKER_COMPOSE) exec $(DEV_SERVICE) bash -c 'for i in {1..30}; do curl -sf http://localhost:3000/up > /dev/null && exit 0; sleep 1; done; echo "Timeout"; exit 1'
+endef
 
-test-e2e-headless: ## Ejecutar tests E2E sin configuración especial (para CI)
-	@echo "$(BLUE)Ejecutando tests E2E modo headless...$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npm run test:e2e
+define stop_test_server
+	@echo "$(BLUE)Restaurando .env original y reiniciando server de desarrollo...$(NC)"
+	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) bash -c "[ -f .env.backup-test ] && mv -f .env.backup-test .env || true"
+	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) php artisan config:clear > /dev/null 2>&1 || true
+	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) bash -c "pkill -f 'artisan serve' 2>/dev/null; sleep 1; nohup php artisan serve --host=0.0.0.0 --port=3000 > /dev/null 2>&1 &" || true
+endef
 
-test-all: ## Ejecutar TODOS los tests (backend + frontend + e2e)
+test-e2e: test-db-prepare ## Ejecutar tests E2E (Cypress) contra BD de testing aislada
+	$(call start_test_server)
+	@echo "$(BLUE)Ejecutando tests E2E con Cypress (puerto 3000, BD cronosmatic_test)...$(NC)"
+	@$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npx cypress run --config-file cypress.docker.config.ts; \
+	  exit_code=$$?; \
+	  $(MAKE) -s _stop_test_server; \
+	  exit $$exit_code
+
+test-e2e-open: test-db-prepare ## Abrir Cypress en modo interactivo (BD de testing aislada)
+	$(call start_test_server)
+	@echo "$(BLUE)Abriendo Cypress UI (puerto 3000, BD cronosmatic_test)...$(NC)"
+	@$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npx cypress open --config-file cypress.docker.config.ts; \
+	  $(MAKE) -s _stop_test_server
+
+test-e2e-headless: test-db-prepare ## Ejecutar tests E2E sin configuración especial (para CI)
+	$(call start_test_server)
+	@$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npm run test:e2e; \
+	  exit_code=$$?; \
+	  $(MAKE) -s _stop_test_server; \
+	  exit $$exit_code
+
+# Helper interno usado por los targets test-e2e* — restaura el .env y reinicia
+# el server de desarrollo apuntando a la BD `cronosmatic` original.
+_stop_test_server:
+	$(call stop_test_server)
+
+test-all: ## Ejecutar TODOS los tests (backend + frontend + e2e) usando db_test
 	@echo "$(BLUE)Ejecutando suite completa de tests...$(NC)"
 	@make test-backend
 	@make test-frontend
@@ -246,6 +328,39 @@ prune: ## Limpiar contenedores, volúmenes e imágenes no utilizados
 reset: down prune up migrate ## Reset completo del entorno
 
 ##@ Desarrollo
+
+setup: ## Configurar el proyecto para desarrollo (idempotente, no destructivo)
+	@echo "$(BLUE)Configurando proyecto para desarrollo...$(NC)"
+	@if [ ! -f .env ]; then \
+		echo "$(YELLOW)No se encontró .env, copiando desde .env.docker.example...$(NC)"; \
+		if [ -f .env.docker.example ]; then \
+			cp .env.docker.example .env; \
+		elif [ -f .env.example ]; then \
+			cp .env.example .env; \
+		else \
+			echo "$(RED)✗ No se encontró .env.docker.example ni .env.example$(NC)"; \
+			exit 1; \
+		fi; \
+		echo "$(GREEN)✓ .env creado$(NC)"; \
+	else \
+		echo "$(GREEN)✓ .env ya existe, no se sobreescribe$(NC)"; \
+	fi
+	@echo "$(BLUE)Levantando servicios Docker...$(NC)"
+	$(DOCKER_COMPOSE) up -d
+	@echo "$(YELLOW)Esperando a que los servicios estén listos...$(NC)"
+	@sleep 10
+	@echo "$(BLUE)Instalando dependencias PHP...$(NC)"
+	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) composer install
+	@echo "$(BLUE)Instalando dependencias Node...$(NC)"
+	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npm ci
+	@echo "$(BLUE)Generando APP_KEY si no existe...$(NC)"
+	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) bash -c 'grep -qE "^APP_KEY=base64:" .env || php artisan key:generate --force'
+	@echo "$(BLUE)Ejecutando migraciones con seed...$(NC)"
+	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) php artisan migrate --seed --force
+	@echo "$(BLUE)Creando enlace simbólico de storage...$(NC)"
+	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) php artisan storage:link 2>/dev/null || true
+	@echo "$(GREEN)✓ Proyecto configurado y listo para desarrollar!$(NC)"
+	@make info
 
 fresh: ## Setup completo desde cero
 	@echo "$(BLUE)Setup completo del proyecto...$(NC)"

@@ -63,3 +63,7 @@ cronosmatic
 # Backups
 /backups/
 *.sql
+
+# Backup creado por make test-e2e (debe restaurarse al final del run)
+.env.backup-test
+.env.testing

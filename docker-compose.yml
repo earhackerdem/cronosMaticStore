@@ -19,6 +19,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      db_test:
+        condition: service_healthy
       redis:
         condition: service_healthy
     environment:
@@ -43,7 +45,7 @@ services:
     networks:
       - cronosmatic_network
 
-  # Base de datos MariaDB
+  # Base de datos MariaDB (desarrollo)
   db:
     image: mariadb:10.11
     container_name: cronosmatic_db
@@ -58,6 +60,31 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - cronosmatic_network
+
+  # Base de datos MariaDB (testing — aislada de la de desarrollo)
+  # Usada por PHPUnit (APP_ENV=testing) y por Cypress E2E.
+  # Se borra y reseedea en cada `make test-e2e` / `make test-all` sin tocar `cronosmatic`.
+  db_test:
+    image: mariadb:10.11
+    container_name: cronosmatic_db_test
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: cronosmatic_test
+      MYSQL_USER: cronosmatic
+      MYSQL_PASSWORD: cronosmatic_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_test_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       start_period: 10s
@@ -122,6 +149,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      db_test:
+        condition: service_healthy
       redis:
         condition: service_healthy
     environment:
@@ -149,6 +178,8 @@ services:
 
 volumes:
   db_data:
+    driver: local
+  db_test_data:
     driver: local
   redis_data:
     driver: local
