@@ -1,0 +1,75 @@
+# Archivos de Git
+.git
+.gitignore
+.gitattributes
+
+# Archivos de configuración local
+.env
+.env.*
+!.env.example
+
+# Dependencias de Node.js
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencias de Composer
+vendor
+composer.phar
+
+# Archivos de build
+public/build
+public/hot
+public/storage
+storage/*.key
+
+# Archivos de cache
+.cache
+.parcel-cache
+.vite
+
+# Archivos de testing
+coverage
+.nyc_output
+.phpunit.result.cache
+storage/framework/testing/
+
+# Archivos de IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Archivos de documentación
+README.md
+DOCKER.md
+docs/
+
+# Archivos de testing
+tests/
+cypress/
+phpunit.xml
+
+# Archivos de configuración de desarrollo
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# Archivos de logs
+*.log
+logs/
+
+# Archivos temporales
+tmp/
+temp/

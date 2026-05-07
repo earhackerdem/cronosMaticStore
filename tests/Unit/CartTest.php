@@ -96,7 +96,7 @@ class CartTest extends TestCase
         CartItem::factory()->create(['cart_id' => $cart->id, 'quantity' => 3]);
 
         $cart->load('items'); // Cargar la relación para el accessor
-
+        
         $this->assertEquals(5, $cart->getTotalItemsAttribute());
     }
 

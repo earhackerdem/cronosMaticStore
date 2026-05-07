@@ -48,3 +48,22 @@ coverage.xml
 /resources/js/ziggy.js
 /resources/js/ziggy.d.ts
 cookies.txt
+
+# Docker
+docker.env
+.env.docker
+
+# Editor
+.claude/
+
+# Test Results
+/tests/results/
+cronosmatic
+
+# Backups
+/backups/
+*.sql
+
+# Backup creado por make test-e2e (debe restaurarse al final del run)
+.env.backup-test
+.env.testing

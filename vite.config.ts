@@ -14,6 +14,27 @@ export default defineConfig({
         react(),
         tailwindcss(),
     ],
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: {
+            host: 'localhost',
+            port: 5173,
+        },
+    },
+    optimizeDeps: {
+        include: [
+            'react',
+            'react-dom/client',
+            'react-dom',
+            'react/jsx-runtime',
+            'react/jsx-dev-runtime',
+            '@inertiajs/react',
+            'laravel-vite-plugin/inertia-helpers',
+            'axios',
+            'sonner',
+        ],
+    },
     esbuild: {
         jsx: 'automatic',
     },

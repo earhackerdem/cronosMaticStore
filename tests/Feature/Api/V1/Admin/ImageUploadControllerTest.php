@@ -29,7 +29,7 @@ class ImageUploadControllerTest extends TestCase
     {
         Sanctum::actingAs($this->adminUser);
 
-        $file = UploadedFile::fake()->image('product.jpg');
+        $file = UploadedFile::fake()->image('product.jpeg');
 
         $response = $this->postJson(route('admin.images.upload'), [
             'image' => $file,
@@ -78,7 +78,7 @@ class ImageUploadControllerTest extends TestCase
     public function test_upload_fails_if_file_is_too_large(): void
     {
         Sanctum::actingAs($this->adminUser);
-        $file = UploadedFile::fake()->image('large_image.jpg')->size(3000); // 3MB, excede 2048KB
+        $file = UploadedFile::fake()->image('large_image.jpeg')->size(3000); // 3MB, excede 2048KB
         $response = $this->postJson(route('admin.images.upload'), [
             'image' => $file,
             'type' => 'products'
@@ -90,7 +90,7 @@ class ImageUploadControllerTest extends TestCase
     public function test_upload_fails_if_type_is_invalid(): void
     {
         Sanctum::actingAs($this->adminUser);
-        $file = UploadedFile::fake()->image('image.jpg');
+        $file = UploadedFile::fake()->image('image.jpeg');
         $response = $this->postJson(route('admin.images.upload'), [
             'image' => $file,
             'type' => 'invalid_type'
@@ -102,7 +102,7 @@ class ImageUploadControllerTest extends TestCase
     public function test_non_admin_cannot_upload_image(): void
     {
         Sanctum::actingAs($this->regularUser);
-        $file = UploadedFile::fake()->image('image.jpg');
+        $file = UploadedFile::fake()->image('image.jpeg');
         $response = $this->postJson(route('admin.images.upload'), [
             'image' => $file,
             'type' => 'products'
@@ -112,7 +112,7 @@ class ImageUploadControllerTest extends TestCase
 
     public function test_guest_cannot_upload_image(): void
     {
-        $file = UploadedFile::fake()->image('image.jpg');
+        $file = UploadedFile::fake()->image('image.jpeg');
         $response = $this->postJson(route('admin.images.upload'), [
             'image' => $file,
             'type' => 'products'

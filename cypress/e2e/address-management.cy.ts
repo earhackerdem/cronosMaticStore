@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 describe('Address Management', () => {
-        describe('Page access and basic functionality', () => {
+    describe('Page access and basic functionality', () => {
         // TODO: Fix authentication - failing due to localStorage auth not working
         // Error: expected 'http://localhost:8000/login' to include '/settings/addresses'
         // Solution: Implement programmatic authentication via cookies/session
@@ -41,7 +41,7 @@ describe('Address Management', () => {
             cy.get('body').then(($body) => {
                 const text = $body.text();
                 // Verificar que contiene elementos relacionados con direcciones
-                expect(text.toLowerCase()).to.satisfy((str) =>
+                expect(text.toLowerCase()).to.satisfy((str: string) =>
                     str.includes('direcciones') ||
                     str.includes('address') ||
                     str.includes('libreta') ||
@@ -153,7 +153,7 @@ describe('Address Management', () => {
 
             // Debería redirigir al login o mostrar error de autenticación
             cy.url().then((url) => {
-                expect(url).to.satisfy((currentUrl) =>
+                expect(url).to.satisfy((currentUrl: string) =>
                     currentUrl.includes('/login') ||
                     currentUrl.includes('/auth') ||
                     currentUrl.includes('/settings/addresses') // Si tiene protección en frontend
@@ -205,7 +205,7 @@ describe('Address Management', () => {
             });
         });
 
-                // TODO: Fix API call interception - failing due to authentication redirect
+        // TODO: Fix API call interception - failing due to authentication redirect
         // Error: cy.wait() timed out waiting for route: getAddresses. No request ever occurred
         // Solution: Proper authentication to allow API calls to execute
         it.skip('should make API call when page loads', () => {
