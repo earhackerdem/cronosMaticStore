@@ -355,8 +355,15 @@ setup: ## Configurar el proyecto para desarrollo (idempotente, no destructivo)
 	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) npm ci
 	@echo "$(BLUE)Generando APP_KEY si no existe...$(NC)"
 	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) bash -c 'grep -qE "^APP_KEY=base64:" .env || php artisan key:generate --force'
-	@echo "$(BLUE)Ejecutando migraciones con seed...$(NC)"
-	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) php artisan migrate --seed --force
+	@echo "$(BLUE)Ejecutando migraciones...$(NC)"
+	$(DOCKER_COMPOSE) exec $(DEV_SERVICE) php artisan migrate --force
+	@echo "$(BLUE)Verificando si la BD necesita seed...$(NC)"
+	@if $(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) php artisan tinker --execute="echo \App\Models\User::count();" 2>/dev/null | tail -n1 | grep -qE '^0$$'; then \
+		echo "$(BLUE)BD vacía, ejecutando seeders...$(NC)"; \
+		$(DOCKER_COMPOSE) exec $(DEV_SERVICE) php artisan db:seed --force; \
+	else \
+		echo "$(GREEN)✓ BD ya tiene datos, omitiendo seed$(NC)"; \
+	fi
 	@echo "$(BLUE)Creando enlace simbólico de storage...$(NC)"
 	@$(DOCKER_COMPOSE) exec -T $(DEV_SERVICE) php artisan storage:link 2>/dev/null || true
 	@echo "$(GREEN)✓ Proyecto configurado y listo para desarrollar!$(NC)"
